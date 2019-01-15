@@ -33,9 +33,17 @@ class YCast:
                 # TODO: Print Usage
                 print("HELP")
             
+            elif cmd == "info" or cmd == "i":
+                # TODO: Print Podcast Info
+                pass
+            
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in args.split(" "):
                     self.manager.subscribe_to_podcast(url)
+            
+            elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
+                # TODO: Implement Unsubscribe
+                pass
             
             elif cmd == "list" or cmd == "ls":
                 self.manager.show_channels()
@@ -63,7 +71,7 @@ class YCast:
                 self.manager.update()
 
             elif cmd == "play" or cmd == "p":
-                # TODO: Play Audio: Stream or Downloaded
+                # TODO: Play Audio: Streamed or Downloaded
                 pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":

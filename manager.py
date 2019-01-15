@@ -35,24 +35,24 @@ class Manager:
                     if item.downloaded and item.title+".mp3" not in os.listdir("downloads"):
                         item.downloaded = False
 
+    def store_channels(self):
+        with open('config/channels.pkl', "wb") as output:
+            pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
+
     def show_channels(self):
         if not self.channels.keys():
             print("No Podcasts Yet!")
         for _, channel in self.channels.items():
             print(channel.title)
             for i, item in enumerate(channel.items):
-                print(f"\t{i}) {item.title} ({item.enclosure.url})")
-    
-    def store_channels(self):
-        with open('config/channels.pkl', "wb") as output:
-            pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
+                print(f"  {i}) {item.title} ({item.enclosure.url})\n    Description: {item.description}")
     
     def download_podcast(self, item):
         if item.downloaded:
-            print("Episodes has already downloaded!")
+            print("Episode has already downloaded!")
             return
         url = item.enclosure.url
-        # TODO: Each Podcast Channel needs its own directory
+        # TODO: Each episode under channel folder
         filename = item.title
         r = requests.get(url, stream=True)
         with open(f"downloads/{filename}.mp3", "wb") as file:
@@ -192,7 +192,7 @@ class Manager:
 
             channel.items.append(item)
         channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
-        self.channels[channel.title] = channel
+        self.channels[url] = channel
 
 
 def parse_pub_date(pubDate):
