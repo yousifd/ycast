@@ -1,17 +1,25 @@
-import readline
 import logging
+import signal
+import sys
 
 from manager import Manager
+from player import Player
 
 class YCast:
     def __init__(self):
         self.manager = Manager()
+        self.player = Player()
+
+        signal.signal(signal.SIGINT, self.handle_exit)
+    
+    def handle_exit(self, sig, frame):
+        self.manager.store_channels()
+        sys.exit(0)
     
     def start(self):
         # RT https://roosterteeth.com/show/rt-podcast/feed/mp3
         # GRC http://leoville.tv/podcasts/sn.xml
         # CC https://corridorcast.libsyn.com/rss
-        # TODO: Deal with force quitting
         quit = False
         while not quit:
             line = input("ycast> ")
@@ -41,17 +49,22 @@ class YCast:
                 # for i in args[1:]:
                 #     item = self.manager.channels[podcast].items[int(i)]
                 #     self.manager.download_podcast(item)
-                self.manager.download_podcast(self.manager.channels["Corridor Cast"].items[0])
+                pass
             
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete Downloaded Episodes
-                podcast = args[0]
-                for i in args[1:]:
-                    item = self.manager.channels[podcast].items[int(i)]
-                    self.manager.delete_podcast(item)
+                # podcast = args[0]
+                # for i in args[1:]:
+                #     item = self.manager.channels[podcast].items[int(i)]
+                #     self.manager.delete_podcast(item)
+                pass
             
             elif cmd == "update" or cmd == "u":
                 self.manager.update()
+
+            elif cmd == "play" or cmd == "p":
+                # TODO: Play Audio: Stream or Downloaded
+                pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
                 self.manager.store_channels()

@@ -26,9 +26,11 @@ class Manager:
         if not os.path.exists("config"):
             os.makedirs("config")
         else:
+            # TODO: Check if channels.pkl exists
             with open("config/channels.pkl", "rb") as input:
                 self.channels = pickle.load(input)
-            for _, channel in self.channels.items(): # Check if downloaded file has been deleted since last time
+            # Check if downloaded file has been deleted since last time
+            for _, channel in self.channels.items():
                 for item in channel.items:
                     if item.downloaded and item.title+".mp3" not in os.listdir("downloads"):
                         item.downloaded = False
@@ -50,7 +52,7 @@ class Manager:
             print("Episodes has already downloaded!")
             return
         url = item.enclosure.url
-        # TODO: Use GUID instead of title
+        # TODO: Each Podcast Channel needs its own directory
         filename = item.title
         r = requests.get(url, stream=True)
         with open(f"downloads/{filename}.mp3", "wb") as file:
