@@ -10,6 +10,7 @@ class YCast:
     def start(self):
         # RT https://roosterteeth.com/show/rt-podcast/feed/mp3
         # GRC http://leoville.tv/podcasts/sn.xml
+        # CC https://corridorcast.libsyn.com/rss
         quit = False
         while not quit:
             line = input("ycast> ")
@@ -21,10 +22,7 @@ class YCast:
                 print("HELP")
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in line[1:]:
-                    try:
-                        self.manager.subscribe_to_podcast(url)
-                    except:
-                        print(f"Invalid URL! {url}")
+                    self.manager.subscribe_to_podcast(url)
             elif cmd == "list" or cmd == "ls":
                 self.manager.show_channels()
             elif cmd == "download" or cmd == "d":
@@ -35,7 +33,8 @@ class YCast:
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete downloaded Podcasts
                 continue
-            elif cmd == "quit" or cmd == "q":
+            elif cmd == "quit" or cmd == "q" or cmd == "exit":
+                self.manager.store_channels()
                 quit = True
                 print("Goodbye!")
             else:

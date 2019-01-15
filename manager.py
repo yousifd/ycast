@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import os
 import logging
 from datetime import datetime
+import pickle
 
 import requests
 
@@ -20,9 +21,17 @@ class Manager:
         self.channels = {}
         self.title_to_url = {}
         # TODO: Download Tracking
+        # TODO: Save Channels on quit
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")
+
+        if not os.path.exists("config"):
+            os.makedirs("config")
+        else:
+            with open("config/channels.pkl", "rb") as input:
+                self.channels = pickle.load(input)
+            print(self.channels)
 
     def show_channels(self):
         if not self.channels.keys():
@@ -31,6 +40,10 @@ class Manager:
             print(channel.title)
             for item in sorted(channel.items, key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True):
                 print(f"\t{item.title} ({item.enclosure.url})")
+    
+    def store_channels(self):
+        with open('config/channels.pkl', "wb") as output:
+            pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
     
     def download_podcast(self, url, filename):
         r = requests.get(url, stream=True)
@@ -62,6 +75,7 @@ class Manager:
         
         if channelElement.find("pubDate") is not None:
             pubDate = channelElement.find("pubDate").text
+            # TODO: Deal with non-UTC timezones
             try:
                 channel.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
             except ValueError as e:
@@ -154,6 +168,7 @@ class Manager:
                 "guid").attrib["isPermaLink"]) if itemElement.find("guid").keys() is not None else True
 
             if itemElement.find("pubDate")is not None:
+                # TODO: Deal with non-UTC timezones
                 pubDate = itemElement.find("pubDate").text
                 try:
                     item.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")

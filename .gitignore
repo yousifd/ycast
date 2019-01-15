@@ -1,5 +1,6 @@
 Pipfile.lock
 *.mp3
+config/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
