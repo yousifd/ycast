@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 import logging
+from datetime import datetime
 
 import requests
 
@@ -18,6 +19,7 @@ class Manager:
     def __init__(self):
         self.channels = {}
         self.title_to_url = {}
+        # TODO: Download Tracking
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")
@@ -25,10 +27,9 @@ class Manager:
     def show_channels(self):
         if not self.channels.keys():
             print("No Podcasts Yet!")
-        for url, channel in self.channels.items():
+        for _, channel in self.channels.items():
             print(channel.title)
-            for item in channel.items:
-                # Sort Episodes by Pub Date
+            for item in sorted(channel.items, key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True):
                 print(f"\t{item.title} ({item.enclosure.url})")
     
     def download_podcast(self, url, filename):
@@ -58,17 +59,24 @@ class Manager:
             "managingEditor").text if channelElement.find("managingEditor") is not None else ""
         channel.webMaster = channelElement.find(
             "webMaster").text if channelElement.find("webMaster") is not None else ""
-        channel.pubDate = channelElement.find(
-            "pubDate").text if channelElement.find("pubDate") is not None else ""
+        
+        if channelElement.find("pubDate") is not None:
+            pubDate = channelElement.find("pubDate").text
+            try:
+                channel.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
+            except ValueError as e:
+                logging.info(f"Channel Parsing: {e}")
+                channel.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %z")
+        
         channel.lastBuildDate = channelElement.find(
             "lastBuildDate").text if channelElement.find("lastBuildDate") is not None else ""
 
         for category in channelElement.findall("category"):
-                cat = Category()
-                cat.value = category.text
-                # TODO: Deal with domains
-                cat.domain = category.attrib["domain"] if category.attrib else ""
-                channel.category.append(cat)
+            cat = Category()
+            cat.value = category.text
+            # TODO: Deal with domains
+            cat.domain = category.attrib["domain"] if category.attrib else ""
+            channel.category.append(cat)
 
         channel.generator = channelElement.find(
             "generator").text if channelElement.find("generator") is not None else ""
@@ -145,8 +153,13 @@ class Manager:
             item.guid.isPermaLink = bool(itemElement.find(
                 "guid").attrib["isPermaLink"]) if itemElement.find("guid").keys() is not None else True
 
-            item.pubDate = itemElement.find("pubDate").text if itemElement.find(
-                "pubDate") is not None else ""
+            if itemElement.find("pubDate")is not None:
+                pubDate = itemElement.find("pubDate").text
+                try:
+                    item.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
+                except ValueError as e:
+                    logging.info(f"Item Parsing {e}")
+                    item.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %z")
 
             item.source = Source()
             item.source.value = itemElement.find(

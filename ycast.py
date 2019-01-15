@@ -19,14 +19,18 @@ class YCast:
             if cmd == "help" or cmd == "h":
                 # TODO: Print Usage
                 print("HELP")
-            elif cmd == "subscribe" or cmd == "sub":
+            elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in line[1:]:
-                    self.manager.subscribe_to_podcast(url)
+                    try:
+                        self.manager.subscribe_to_podcast(url)
+                    except:
+                        print(f"Invalid URL! {url}")
             elif cmd == "list" or cmd == "ls":
                 self.manager.show_channels()
             elif cmd == "download" or cmd == "d":
                 for url in line[1:]:
-                    # TODO: self.manager.download_podcast(url, )
+                    # TODO: Downloads
+                    # self.manager.download_podcast(url, )
                     pass
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete downloaded Podcasts
