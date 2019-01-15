@@ -1,5 +1,6 @@
 class Channel:
     def __init__(self):
+        # Spec
         self.items = []
         self.title = ""
         self.link = ""
@@ -20,6 +21,8 @@ class Channel:
         self.textInput = None
         self.skipHours = ""
         self.skipDays = ""
+
+        # Internal
 
     def __str__(self):
         return self.title

@@ -19,9 +19,6 @@ from feed.textinput import TextInput
 class Manager:
     def __init__(self):
         self.channels = {}
-        self.title_to_url = {}
-        # TODO: Download Tracking
-        # TODO: Save Channels on quit
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")
@@ -31,25 +28,46 @@ class Manager:
         else:
             with open("config/channels.pkl", "rb") as input:
                 self.channels = pickle.load(input)
-            print(self.channels)
+            for _, channel in self.channels.items(): # Check if downloaded file has been deleted since last time
+                for item in channel.items:
+                    if item.downloaded and item.title+".mp3" not in os.listdir("downloads"):
+                        item.downloaded = False
 
     def show_channels(self):
         if not self.channels.keys():
             print("No Podcasts Yet!")
         for _, channel in self.channels.items():
             print(channel.title)
-            for item in sorted(channel.items, key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True):
-                print(f"\t{item.title} ({item.enclosure.url})")
+            for i, item in enumerate(channel.items):
+                print(f"\t{i}) {item.title} ({item.enclosure.url})")
     
     def store_channels(self):
         with open('config/channels.pkl', "wb") as output:
             pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
     
-    def download_podcast(self, url, filename):
+    def download_podcast(self, item):
+        if item.downloaded:
+            print("Episodes has already downloaded!")
+            return
+        url = item.enclosure.url
+        # TODO: Use GUID instead of title
+        filename = item.title
         r = requests.get(url, stream=True)
-        with open(f"downloads/{filename}", "wb") as file:
+        with open(f"downloads/{filename}.mp3", "wb") as file:
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
+        item.downloaded = True
+
+    def delete_podcast(self, item):
+        if not item.downloaded:
+            print("Episode hasn't been downloaded yet!")
+            return
+        os.remove(f"downloads/{item.title}.mp3")
+        item.downloaded = False
+
+    def update(self):
+        # TODO: Check for Updates
+        pass
 
     def subscribe_to_podcast(self, url):
         if url in self.channels:
@@ -183,5 +201,5 @@ class Manager:
                 "source").attrib["url"] if itemElement.find("source") is not None else ""
 
             channel.items.append(item)
-        self.channels[url] = channel
-        self.title_to_url[channel.title] = url
+        channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
+        self.channels[channel.title] = channel

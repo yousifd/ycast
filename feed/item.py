@@ -1,5 +1,6 @@
 class Item:
     def __init__(self):
+        # Spec
         self.title = ""
         self.link = ""
         self.description = ""
@@ -11,3 +12,6 @@ class Item:
         self.guid = None
         self.pubDate = ""
         self.source = None
+
+        # Internal
+        self.downloaded = False
