@@ -17,9 +17,19 @@ from textinput import TextInput
 class Manager:
     def __init__(self):
         self.channels = {}
+        self.title_to_url = {}
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")
+
+    def show_channels(self):
+        if not self.channels.keys():
+            print("No Podcasts Yet!")
+        for url, channel in self.channels.items():
+            print(channel.title)
+            for item in channel.items:
+                # Sort Episodes by Pub Date
+                print(f"\t{item.title} ({item.enclosure.url})")
     
     def download_podcast(self, url, filename):
         r = requests.get(url, stream=True)
@@ -29,7 +39,7 @@ class Manager:
 
     def subscribe_to_podcast(self, url):
         if url in self.channels:
-            logging.info(f"Channel {url} already subscribed to!")
+            print(f"Channel {url} already subscribed to!")
             return
         r = requests.get(url)
         logging.debug(r.text)
@@ -146,3 +156,4 @@ class Manager:
 
             channel.items.append(item)
         self.channels[url] = channel
+        self.title_to_url[channel.title] = url

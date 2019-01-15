@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 from ycast import YCast
 
 def main():

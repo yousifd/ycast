@@ -1,3 +1,6 @@
+import readline
+import logging
+
 from manager import Manager
 
 class YCast:
@@ -9,17 +12,27 @@ class YCast:
         # GRC http://leoville.tv/podcasts/sn.xml
         quit = False
         while not quit:
-            cmd = input("Options\n1) Manage Subscriptions\n2) Browse Podcasts\n3) Quit\n> ")
-            cmd = int(cmd)
-            if not isinstance(cmd, int):
-                print("Invalid Command!")
+            line = input("ycast> ")
+            logging.debug(line)
+            line = line.split(" ")
+            cmd = line[0]
+            if cmd == "help" or cmd == "h":
+                # TODO: Print Usage
+                print("HELP")
+            elif cmd == "subscribe" or cmd == "sub":
+                for url in line[1:]:
+                    self.manager.subscribe_to_podcast(url)
+            elif cmd == "list" or cmd == "ls":
+                self.manager.show_channels()
+            elif cmd == "download" or cmd == "d":
+                for url in line[1:]:
+                    # TODO: self.manager.download_podcast(url, )
+                    pass
+            elif cmd == "delete" or cmd == "del":
+                # TODO:
                 continue
-            if cmd == 1:
-                print("Manage Subscriptions")
-            elif cmd == 2:
-                print("Browse Podcasts")
-            elif cmd == 3:
+            elif cmd == "quit" or cmd == "q":
                 quit = True
+                print("Goodbye!")
             else:
                 print("Invalid Command!")
-        print("Exiting")
