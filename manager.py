@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 import os
 import logging
-from datetime import datetime
 import pickle
+from datetime import datetime
 
 import requests
 
@@ -93,12 +93,7 @@ class Manager:
         
         if channelElement.find("pubDate") is not None:
             pubDate = channelElement.find("pubDate").text
-            # TODO: Deal with non-UTC timezones
-            try:
-                channel.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
-            except ValueError as e:
-                logging.info(f"Channel Parsing: {e}")
-                channel.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %z")
+            channel.pubDate = parse_pub_date(pubDate)
         
         channel.lastBuildDate = channelElement.find(
             "lastBuildDate").text if channelElement.find("lastBuildDate") is not None else ""
@@ -106,7 +101,6 @@ class Manager:
         for category in channelElement.findall("category"):
             cat = Category()
             cat.value = category.text
-            # TODO: Deal with domains
             cat.domain = category.attrib["domain"] if category.attrib else ""
             channel.category.append(cat)
 
@@ -167,7 +161,6 @@ class Manager:
             for category in itemElement.findall("category"):
                 cat = Category()
                 cat.value = category.text
-                # TODO: Deal with domains
                 cat.domain = category.attrib["domain"] if category.attrib else ""
                 item.category.append(cat)
 
@@ -185,14 +178,9 @@ class Manager:
             item.guid.isPermaLink = bool(itemElement.find(
                 "guid").attrib["isPermaLink"]) if itemElement.find("guid").keys() is not None else True
 
-            if itemElement.find("pubDate")is not None:
-                # TODO: Deal with non-UTC timezones
+            if itemElement.find("pubDate") is not None:
                 pubDate = itemElement.find("pubDate").text
-                try:
-                    item.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
-                except ValueError as e:
-                    logging.info(f"Item Parsing {e}")
-                    item.pubDate = datetime.strptime(pubDate, "%a, %d %b %Y %X %z")
+                item.pubDate = parse_pub_date(pubDate)
 
             item.source = Source()
             item.source.value = itemElement.find(
@@ -203,3 +191,15 @@ class Manager:
             channel.items.append(item)
         channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
         self.channels[channel.title] = channel
+
+
+def parse_pub_date(pubDate):
+    # TODO: Deal with non-UTC timezones
+    ret = None
+    try:
+        ret = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
+    except ValueError as e:
+        logging.info(f"Channel Parsing: {e}")
+        ret = datetime.strptime(
+            pubDate, "%a, %d %b %Y %X %z")
+    return ret

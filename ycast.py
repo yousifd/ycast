@@ -51,9 +51,7 @@ class YCast:
                     self.manager.delete_podcast(item)
             
             elif cmd == "update" or cmd == "u":
-                # TODO: Check for episode updates
                 self.manager.update()
-                pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
                 self.manager.store_channels()
