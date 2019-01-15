@@ -4,15 +4,15 @@ import logging
 
 import requests
 
-from channel import Channel
-from item import Item
-from category import Category
-from enclosure import Enclosure
-from guid import GUID
-from source import Source
-from cloud import Cloud
-from image import Image
-from textinput import TextInput
+from feed.channel import Channel
+from feed.item import Item
+from feed.category import Category
+from feed.enclosure import Enclosure
+from feed.guid import GUID
+from feed.source import Source
+from feed.cloud import Cloud
+from feed.image import Image
+from feed.textinput import TextInput
 
 class Manager:
     def __init__(self):

@@ -29,7 +29,7 @@ class YCast:
                     # TODO: self.manager.download_podcast(url, )
                     pass
             elif cmd == "delete" or cmd == "del":
-                # TODO:
+                # TODO: Delete downloaded Podcasts
                 continue
             elif cmd == "quit" or cmd == "q":
                 quit = True
