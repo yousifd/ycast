@@ -47,8 +47,10 @@ class YCast:
                     t.start()
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
-                # TODO: Implement Unsubscribe
-                pass
+                channels = list(self.manager.channels.values())
+                self.manager.show_channels()
+                channel_index = int(input("Which Channel do you want to unsubscribe from? "))
+                self.manager.unsubscribe_from_podcast(channels[channel_index])
             
             elif cmd == "list" or cmd == "ls":
                 self.manager.show_all()
@@ -56,9 +58,6 @@ class YCast:
             elif cmd == "download" or cmd == "d":
                 # TODO: Paginate Results if they are greater than 10 (or some other value)
                 channels = list(self.manager.channels.values())
-                if not channels:
-                    print("No Podcasts Avaialable!")
-                    continue
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to download from? "))
                 channel = channels[channel_index]
@@ -77,7 +76,7 @@ class YCast:
                 pass
             
             elif cmd == "update" or cmd == "u":
-                self.manager.update()
+                self.manager.update_all()
 
             elif cmd == "play" or cmd == "p":
                 # TODO: Play Audio: Streamed or Downloaded

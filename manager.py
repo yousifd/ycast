@@ -27,7 +27,6 @@ class Manager:
         if not os.path.exists("config"):
             os.makedirs("config")
         else:
-            # TODO: Check if channels.pkl exists
             with open("config/channels.pkl", "rb") as input:
                 self.channels = pickle.load(input)
             # Check if downloaded file has been deleted since last time
@@ -48,6 +47,8 @@ class Manager:
             print(f"  {i}) {item.title} ({item.enclosure.url})")
 
     def show_channels(self):
+        if not self.channels.keys():
+            print("No Podcasts Yet!")
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
             print(f"{i}) {channel.title}")
@@ -55,7 +56,6 @@ class Manager:
     def show_all(self):
         if not self.channels.keys():
             print("No Podcasts Yet!")
-        print(enumerate(self.channels))
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
             print(f"{i}) {channel.title}")
@@ -85,8 +85,16 @@ class Manager:
         os.remove(f"downloads/{item.title}.mp3")
         item.downloaded = False
 
-    def update(self):
+    def update_all(self):
+        for _, channel in self.channels.items():
+            self.update(channel)
+
+    def update(self, channel):
         # TODO: Check for Updates
+        pass
+
+    def unsubscribe_from_podcast(self, channel):
+        # TODO: Unsubscribe
         pass
 
     def subscribe_to_podcast(self, url):
