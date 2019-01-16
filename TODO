@@ -1,0 +1,11 @@
+CLI:
+    - Interactive
+    - Download Progress Bar
+
+Player:
+    - Play Audio
+    - Implement Player
+
+Errors:
+    - Raise Exceptions instead of just printing
+        # Handle all printing in ycast

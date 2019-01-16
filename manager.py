@@ -18,7 +18,8 @@ from feed.textinput import TextInput
 
 class Manager:
     def __init__(self):
-        self.channels = {}
+        self.channels = {} # Pickled
+        self.title_to_url = {}
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")
@@ -30,7 +31,8 @@ class Manager:
             with open("config/channels.pkl", "rb") as input:
                 self.channels = pickle.load(input)
             # Check if downloaded file has been deleted since last time
-            for _, channel in self.channels.items():
+            for url, channel in self.channels.items():
+                self.title_to_url[channel.title] = url
                 for item in channel.items:
                     if item.downloaded and item.title+".mp3" not in os.listdir("downloads"):
                         item.downloaded = False
@@ -39,23 +41,37 @@ class Manager:
         with open('config/channels.pkl', "wb") as output:
             pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
 
+    def show_items(self, channel):
+        if channel.link not in self.channels:
+            print("Channel doesn't Exist!")
+        for i, item in enumerate(channel.items):
+            print(f"  {i}) {item.title} ({item.enclosure.url})")
+
     def show_channels(self):
+        for i, pair in enumerate(self.channels.items()):
+            channel = pair[1]
+            print(f"{i}) {channel.title}")
+    
+    def show_all(self):
         if not self.channels.keys():
             print("No Podcasts Yet!")
-        for _, channel in self.channels.items():
-            print(channel.title)
+        print(enumerate(self.channels))
+        for i, pair in enumerate(self.channels.items()):
+            channel = pair[1]
+            print(f"{i}) {channel.title}")
             for i, item in enumerate(channel.items):
-                print(f"  {i}) {item.title} ({item.enclosure.url})\n    Description: {item.description}")
+                print(f"  {i}) {item.title} ({item.enclosure.url})")
     
-    def download_podcast(self, item):
+    def download_podcast(self, item, channel):
         if item.downloaded:
             print("Episode has already downloaded!")
             return
+        if not os.path.exists(f"downloads/{channel.title}"):
+            os.makedirs(f"downloads/{channel.title}")
         url = item.enclosure.url
-        # TODO: Each episode under channel folder
         filename = item.title
         r = requests.get(url, stream=True)
-        with open(f"downloads/{filename}.mp3", "wb") as file:
+        with open(f"downloads/{channel.title}/{filename}.mp3", "wb") as file:
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
         item.downloaded = True
@@ -193,6 +209,7 @@ class Manager:
             channel.items.append(item)
         channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
         self.channels[url] = channel
+        self.title_to_url[channel.title] = url
 
 
 def parse_pub_date(pubDate):

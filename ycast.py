@@ -46,18 +46,17 @@ class YCast:
                 pass
             
             elif cmd == "list" or cmd == "ls":
-                self.manager.show_channels()
+                self.manager.show_all()
             
             elif cmd == "download" or cmd == "d":
-                # TODO: Download Episodes
-                # Possibly show list and be able to move through it using arrow keys
-                # Maps options to episode item
-                # args = args.split(" ")
-                # podcast = args[0]
-                # for i in args[1:]:
-                #     item = self.manager.channels[podcast].items[int(i)]
-                #     self.manager.download_podcast(item)
-                pass
+                self.manager.show_channels()
+                channel_index = int(input("Which Channel do you want to download from? "))
+                channels = list(self.manager.channels.values())
+                channel = channels[channel_index]
+                self.manager.show_items(channel)
+                item_index = int(input("Which Item do you want download? "))
+                item = channel.items[item_index]
+                self.manager.download_podcast(item, channel)
             
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete Downloaded Episodes
