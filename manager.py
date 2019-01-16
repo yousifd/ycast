@@ -66,10 +66,12 @@ class Manager:
         if item.downloaded:
             print("Episode has already downloaded!")
             return
+
         if not os.path.exists(f"downloads/{channel.title}"):
             os.makedirs(f"downloads/{channel.title}")
         url = item.enclosure.url
         filename = item.title
+
         r = requests.get(url, stream=True)
         with open(f"downloads/{channel.title}/{filename}.mp3", "wb") as file:
             for chunk in r.iter_content(chunk_size=1024):

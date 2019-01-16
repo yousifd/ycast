@@ -1,6 +1,7 @@
 import logging
 import signal
 import sys
+import threading
 
 from manager import Manager
 from player import Player
@@ -32,6 +33,9 @@ class YCast:
             if cmd == "help" or cmd == "?":
                 # TODO: Print Usage
                 print("HELP")
+
+            elif cmd == "":
+                continue
             
             elif cmd == "info" or cmd == "i":
                 # TODO: Print Podcast Info
@@ -49,6 +53,7 @@ class YCast:
                 self.manager.show_all()
             
             elif cmd == "download" or cmd == "d":
+                # TODO: Paginate Results if they are greater than 10 (or some other value)
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to download from? "))
                 channels = list(self.manager.channels.values())
@@ -56,7 +61,8 @@ class YCast:
                 self.manager.show_items(channel)
                 item_index = int(input("Which Item do you want download? "))
                 item = channel.items[item_index]
-                self.manager.download_podcast(item, channel)
+                t = threading.Thread(target=self.manager.download_podcast, args=(item, channel))
+                t.start()
             
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete Downloaded Episodes
@@ -74,6 +80,7 @@ class YCast:
                 pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
+                # TODO: Wait on all downloads (Maybe get a download manager)
                 self.manager.store_channels()
                 quit = True
                 print("Goodbye!")
