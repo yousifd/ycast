@@ -43,7 +43,8 @@ class YCast:
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in args.split(" "):
-                    self.manager.subscribe_to_podcast(url)
+                    t = threading.Thread(target=self.manager.subscribe_to_podcast, args=(url,))
+                    t.start()
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 # TODO: Implement Unsubscribe
@@ -54,9 +55,12 @@ class YCast:
             
             elif cmd == "download" or cmd == "d":
                 # TODO: Paginate Results if they are greater than 10 (or some other value)
+                channels = list(self.manager.channels.values())
+                if not channels:
+                    print("No Podcasts Avaialable!")
+                    continue
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to download from? "))
-                channels = list(self.manager.channels.values())
                 channel = channels[channel_index]
                 self.manager.show_items(channel)
                 item_index = int(input("Which Item do you want download? "))
