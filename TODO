@@ -1,15 +1,16 @@
-Code:
+Naming:
     - Podcast or Channel?
     - Item or Episode?
 
 CLI:
-    - Interactive
+    - Interactive and Dynamic CLI
+        # Scroll through list of channels and items
     - Download Progress Bar
 
 Player:
-    - Play Audio
-    - Implement Player
+    - Stream Audio
 
 Errors:
     - Raise Exceptions instead of just printing
-        # Handle all printing in ycast
+        # Handle all printing in the Ycast class
+    - Deal with Input Errors

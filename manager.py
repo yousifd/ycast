@@ -33,7 +33,7 @@ class Manager:
             for url, channel in self.channels.items():
                 self.title_to_url[channel.title] = url
                 for item in channel.items:
-                    if item.downloaded and item.title+".mp3" not in os.listdir("downloads"):
+                    if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
                         item.downloaded = False
 
     def store_channels(self):
