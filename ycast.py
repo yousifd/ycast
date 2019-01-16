@@ -10,6 +10,7 @@ class YCast:
     def __init__(self):
         self.manager = Manager()
         self.player = Player()
+        self.threads = []
 
         signal.signal(signal.SIGINT, self.handle_exit)
     
@@ -43,8 +44,9 @@ class YCast:
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in args.split(" "):
-                    t = threading.Thread(target=self.manager.subscribe_to_podcast, args=(url,))
+                    t = threading.Thread(target=self.manager.subscribe_to_podcast, args=(url,), name=f"Subscribing to {url}")
                     t.start()
+                    self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 channels = list(self.manager.channels.values())
@@ -53,6 +55,7 @@ class YCast:
                 self.manager.unsubscribe_from_podcast(channels[channel_index])
             
             elif cmd == "list" or cmd == "ls":
+                # TODO: Pagination
                 self.manager.show_all()
             
             elif cmd == "download" or cmd == "d":
@@ -64,8 +67,9 @@ class YCast:
                 self.manager.show_items(channel)
                 item_index = int(input("Which Item do you want download? "))
                 item = channel.items[item_index]
-                t = threading.Thread(target=self.manager.download_podcast, args=(item, channel))
+                t = threading.Thread(target=self.manager.download_podcast, args=(item, channel), name=f"Downloading {channel.title}: {item.title}")
                 t.start()
+                self.threads.append(t)
             
             elif cmd == "delete" or cmd == "del":
                 # TODO: Delete Downloaded Episodes
@@ -83,8 +87,10 @@ class YCast:
                 pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
-                # TODO: Wait on all downloads (Maybe get a download manager)
                 self.manager.store_channels()
+                for thread in self.threads:
+                    print(f"Waiting for: {thread.name}")
+                    thread.join()
                 quit = True
                 print("Goodbye!")
 

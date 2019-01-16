@@ -95,6 +95,7 @@ class Manager:
 
     def unsubscribe_from_podcast(self, channel):
         # TODO: Unsubscribe
+        # TODO: Remove Already Installed Episodes
         pass
 
     def subscribe_to_podcast(self, url):
