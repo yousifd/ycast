@@ -49,6 +49,7 @@ class YCast:
                     self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
+                # TODO: Move Channel selection to standalone function
                 channels = list(self.manager.channels.values())
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to unsubscribe from? "))
@@ -60,6 +61,7 @@ class YCast:
             
             elif cmd == "download" or cmd == "d":
                 # TODO: Paginate Results if they are greater than 10 (or some other value)
+                # TODO: Move Channel selection and item selection to standalone function
                 channels = list(self.manager.channels.values())
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to download from? "))
@@ -79,11 +81,28 @@ class YCast:
                 #     self.manager.delete_podcast(item)
                 pass
             
+            # TODO: Sync cmd updates all channels
+
             elif cmd == "update" or cmd == "u":
+                # TODO: Only updates a specific channel
                 self.manager.update_all()
 
             elif cmd == "play" or cmd == "p":
                 # TODO: Play Audio: Streamed or Downloaded
+                    # Only 1 audio can be played at a time (automatically stop currently running and play new one)
+                    # Store current position and start from there next time you play
+                pass
+
+            elif cmd == "pause":
+                # TODO: Pause Audio
+                pass
+            
+            elif cmd == "unpause" or cmd == "continue":
+                # TODO: Unpause Audio:
+                pass
+            
+            elif cmd == "stop":
+                # TODO: Stop Audio
                 pass
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
