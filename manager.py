@@ -35,6 +35,7 @@ class Manager:
     def __init__(self):
         self.channels = {} # Pickled
         self.title_to_url = {}
+        self.channel_to_items = {}
         self.threads = []
 
         if not os.path.exists("downloads"):
@@ -43,16 +44,19 @@ class Manager:
     def __getstate__(self):
         d = dict(self.__dict__)
         del d['title_to_url']
+        del d['channel_to_items']
         del d['threads']
         return d
     
     def __setstate__(self, d):
         self.__dict__.update(d)
         self.title_to_url = {}
+        self.channel_to_items = {}
         self.threads = []
         # Check if a downloaded file has been deleted since last time
         for url, channel in self.channels.items():
             self.title_to_url[channel.title] = url
+            self.channel_to_items[channel.title] = set(channel.items)
             for item in channel.items:
                 if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
                     item.downloaded = False
@@ -102,13 +106,30 @@ class Manager:
         item.downloaded = False
 
     def update_all(self):
+        ret = list()
         for _, channel in self.channels.items():
-            self.update(channel)
+            ret.extend(self.update(channel))
+        return ret
 
     def update(self, channel):
-        # TODO: Check for Updates
-        # TODO: Show/return new episodes
-        pass
+        updated = False
+        r = requests.get(self.title_to_url[channel.title])
+        channel_new = self.parse_channel(r.text)
+        ret = [f"{channel.title}\n"]
+        for item_new in channel_new.items:
+            # Assuming that all channels follow pubDate order
+            # and first mismatch means no new episodes
+            if item_new.title in self.channel_to_items[channel.title]:
+                if not updated:
+                    ret = list()
+                else:
+                    ret[-1] = ret[-1][:-1]
+                break
+            else:
+                channel.items.insert(0, item_new)
+                ret.append(f"{item_new.title}\n")
+                updated = True
+        return ret
 
     def unsubscribe_from_channel(self, channel):
         channel_title = channel.title
@@ -127,12 +148,12 @@ class Manager:
     def sub_to_channel_thread(self, url):
         r = requests.get(url)
         logging.debug(r.text)
-        channel = self.parse_channel(r)
+        channel = self.parse_channel(r.text)
         self.channels[url] = channel
         self.title_to_url[channel.title] = url
     
-    def parse_channel(self, r):
-        root = ET.fromstring(r.text)
+    def parse_channel(self, text):
+        root = ET.fromstring(text)
         channel = Channel()
         channelElement = root.find("channel")
         channel.title = channelElement.find("title").text
@@ -207,6 +228,8 @@ class Manager:
         channel.skipDays = channelElement.find(
             "skipDays").text if channelElement.find("skipDays") is not None else ""
 
+        self.channel_to_items[channel.title] = set()
+
         for itemElement in channelElement.findall("item"):
             item = Item()
             item.title = itemElement.find("title").text
@@ -246,6 +269,8 @@ class Manager:
                 "source").attrib["url"] if itemElement.find("source") is not None else ""
 
             channel.items.append(item)
+            self.channel_to_items[channel.title].add(item.title)
+
         channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
         return channel
 

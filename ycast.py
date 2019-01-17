@@ -99,7 +99,10 @@ class YCast:
             
             elif cmd == "sync":
                 updates = self.manager.update_all()
-                print(updates)
+                if updates:
+                    print(updates)
+                else:
+                    print("No new Episodes")
 
             elif cmd == "update" or cmd == "u":
                 self.get_channel_apply("Update", self.update_channel)
@@ -146,7 +149,10 @@ class YCast:
 
     def update_channel(self, channel):
         update = self.manager.update(channel)
-        print(update)
+        if update:
+            print(update)
+        else:
+            print("No new Episodes")
 
     def show_all(self):
         item_index = None

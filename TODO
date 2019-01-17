@@ -3,7 +3,9 @@ CLI:
 
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
-        # Python Bindings for https://github.com/lieff/minimp3
+        Python Bindings for https://github.com/lieff/minimp3
+        https://docs.python.org/3.7/extending/extending.html
+        https://github.com/michaelboulton/python_mp3_decoder/tree/master/pymp3decoder
     ☐ Playback Speed @created(19-01-17 00:18)
     ☐ Ability to skip forwards and backwards @created(19-01-17 00:18)
     ☐ Playback Speed Normalization @created(19-01-17 01:57)
