@@ -75,12 +75,12 @@ class YCast:
                     self.threads.append(t)
             
             elif cmd == "delete" or cmd == "del":
-                # TODO: Delete Downloaded Episodes
-                # podcast = args[0]
-                # for i in args[1:]:
-                #     item = self.manager.channels[podcast].items[int(i)]
-                #     self.manager.delete_podcast(item)
-                pass
+                channel = self.select_channel("Delete")
+                for item_index in self.select_item_indexes(channel, "Delete"):
+                    item = channel.items[item_index]
+                    t = threading.Thread(target=self.manager.delete_podcast, args=(item, channel))
+                    t.start()
+                    self.threads.append(t)
             
             elif cmd == "sync":
                 self.manager.update_all()
@@ -106,6 +106,12 @@ class YCast:
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
                 self.handle_exit()
+            
+            # TODO: Set Volume
+            # TODO: Skip
+
+            elif cmd == "restart":
+                self.player.restart()
 
             else:
                 print("Invalid Command!")
