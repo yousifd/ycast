@@ -42,12 +42,14 @@ class Manager:
             pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
 
     def show_items(self, channel):
+        # TODO: Move to ycast.py
         if channel.link not in self.channels:
             print("Channel doesn't Exist!")
         for i, item in enumerate(channel.items):
             print(f"  {i}) {item.title} ({item.enclosure.url})")
 
     def show_channels(self):
+        # TODO: Move to ycast.py
         if not self.channels.keys():
             print("No Podcasts Yet!")
         for i, pair in enumerate(self.channels.items()):
@@ -55,6 +57,7 @@ class Manager:
             print(f"{i}) {channel.title}")
     
     def show_all(self):
+        # TODO: Move to ycast.py
         if not self.channels.keys():
             print("No Podcasts Yet!")
         for i, pair in enumerate(self.channels.items()):

@@ -58,7 +58,7 @@ class YCast:
                     self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
-                channel = self.select_channel()
+                channel = self.select_channel("Unsubscribe")
                 self.manager.unsubscribe_from_podcast(channel.title)
             
             elif cmd == "list" or cmd == "ls":
@@ -66,8 +66,8 @@ class YCast:
                 self.manager.show_all()
             
             elif cmd == "download" or cmd == "d":
-                channel = self.select_channel()
-                for item_index in self.select_item_indexes(channel):
+                channel = self.select_channel("Download")
+                for item_index in self.select_item_indexes(channel, "Download"):
                     item = channel.items[item_index]
                     t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
                     t.start()
@@ -85,26 +85,23 @@ class YCast:
                 self.manager.update_all()
 
             elif cmd == "update" or cmd == "u":
-                # TODO: Update Specific Channel
-                pass
+                channel = self.select_channel("Update")
+                self.manager.update(channel)
 
             elif cmd == "play" or cmd == "p":
-                # TODO: Play Audio: Streamed or Downloaded
-                    # Only 1 audio can be played at a time (automatically stop currently running and play new one)
-                    # Store current position and start from there next time you play
-                pass
+                channel = self.select_channel("Play")
+                for item_index in self.select_item_indexes(channel, "Play"):
+                    item = channel.items[item_index]
+                    self.player.play(item)
 
             elif cmd == "pause":
-                # TODO: Pause Audio
-                pass
+                self.player.pause()
             
             elif cmd == "unpause" or cmd == "continue":
-                # TODO: Unpause Audio
-                pass
+                self.player.unpause()
             
             elif cmd == "stop":
-                # TODO: Stop Audio
-                pass
+                self.player.stop()
             
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
                 self.handle_exit()
@@ -112,18 +109,25 @@ class YCast:
             else:
                 print("Invalid Command!")
 
-    def select_channel(self):
+    def select_channel(self, purpose):
         # TODO: Paginate Results if they are greater than 10 (or some other value)
         channels = list(self.manager.channels.values())
         self.manager.show_channels()
         # TODO: Deal with Invalid Inputs
-        channel_index = int(input("Which Channel do you want to download from? "))
+        channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
         return channels[channel_index]
     
-    def select_item_indexes(self, channel):
+    def select_item(self, channel, purpose):
         # TODO: Paginate Results if they are greater than 10 (or some other value)
         self.manager.show_items(channel)
         # TODO: Deal with Invalid Inputs
-        item_indexes = input("Which Items do you want download? ")
+        item_index = int(input(f"Which item do you want to {purpose}? "))
+        return item_index
+
+    def select_item_indexes(self, channel, purpose):
+        # TODO: Paginate Results if they are greater than 10 (or some other value)
+        self.manager.show_items(channel)
+        # TODO: Deal with Invalid Inputs
+        item_indexes = input(f"Which Items do you want {purpose}? ")
         item_indexes = map(int, item_indexes.split(" "))
         return item_indexes

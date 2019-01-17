@@ -9,6 +9,10 @@ CLI:
 
 Player:
     - Stream Audio
+    - Play audio if it is downloaded, stream it if it is not
+
+Downloads:
+    - Custom Download Directory
 
 Errors:
     - Raise Exceptions instead of just printing
