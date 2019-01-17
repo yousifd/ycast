@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import os
 import shutil
 import logging
+import threading
 from datetime import datetime
 
 import requests
@@ -31,6 +32,7 @@ class Manager:
     def __init__(self):
         self.channels = {} # Pickled
         self.title_to_url = {}
+        self.threads = []
 
         if not os.path.exists("downloads"):
             os.makedirs("downloads")         
@@ -38,11 +40,13 @@ class Manager:
     def __getstate__(self):
         d = dict(self.__dict__)
         del d['title_to_url']
+        del d['threads']
         return d
     
     def __setstate__(self, d):
         self.__dict__.update(d)
         self.title_to_url = {}
+        self.threads = []
         # Check if downloaded file has been deleted since last time
         for url, channel in self.channels.items():
             self.title_to_url[channel.title] = url
@@ -50,6 +54,21 @@ class Manager:
                 if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
                     item.downloaded = False
     
+    def quit(self):
+        self.wait_for_all_threads()
+    
+    def wait_for_all_threads(self):
+        for thread in self.threads:
+            if thread.is_alive():
+                print(f"Waiting for: {thread.name}")
+            thread.join()
+    
+    def download_url(self, url, channel_title, filename):
+        r = requests.get(url, stream=True)
+        with open(f"downloads/{channel_title}/{filename}.mp3", "wb") as file:
+            for chunk in r.iter_content(chunk_size=1024):
+                file.write(chunk)
+
     def download_item(self, item, channel):
         if item.downloaded:
             print(f"Episode {item.title} has already been downloaded") # TODO: Raise Exception
@@ -62,11 +81,12 @@ class Manager:
                 pass
         url = item.enclosure.url
         filename = item.title
+        channel_title = channel.title
 
-        r = requests.get(url, stream=True)
-        with open(f"downloads/{channel.title}/{filename}.mp3", "wb") as file:
-            for chunk in r.iter_content(chunk_size=1024):
-                file.write(chunk)
+        t = threading.Thread(target=self.download_url, args=(
+            url, channel_title, filename), name=f"Downloading {channel.title}: {item.title}")
+        t.start()
+        self.threads.append(t)
         item.downloaded = True
 
     def delete_item(self, item, channel):
@@ -74,7 +94,10 @@ class Manager:
             print(f"Episode {item.title} hasn't been downloaded yet!") # TODO: Raise Exception
             return
 
-        os.remove(f"downloads/{channel.title}/{item.title}.mp3")
+        file = f"downloads/{channel.title}/{item.title}.mp3"
+        t = threading.Thread(target=os.remove, args=(file,), name=f"Deleting {item.title}")
+        t.start()
+        self.threads.append(t)
         item.downloaded = False
 
     def update_all(self):
@@ -96,8 +119,18 @@ class Manager:
         if url in self.channels:
             print(f"Podcast {url} already subscribed to!") # TODO: Raise Exception
             return
+        t = threading.Thread(target=self.sub_to_channel_thread, args=(url,), name=f"Subscribing to {url}")
+        t.start()
+        self.threads.append(t)
+    
+    def sub_to_channel_thread(self, url):
         r = requests.get(url)
         logging.debug(r.text)
+        channel = self.parse_channel(r)
+        self.channels[url] = channel
+        self.title_to_url[channel.title] = url
+    
+    def parse_channel(self, r):
         root = ET.fromstring(r.text)
         channel = Channel()
         channelElement = root.find("channel")
@@ -213,8 +246,7 @@ class Manager:
 
             channel.items.append(item)
         channel.items.sort(key=lambda x: x.pubDate if x.pubDate is not None else datetime.now(), reverse=True)
-        self.channels[url] = channel
-        self.title_to_url[channel.title] = url
+        return channel
 
 
 def parse_pub_date(pubDate):

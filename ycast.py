@@ -3,7 +3,6 @@
 import logging
 import signal
 import sys
-import threading
 import os
 import pickle
 
@@ -16,7 +15,6 @@ class YCast:
         self.quit = False
         self.manager = Manager()
         self.player = Player()
-        self.threads = []
 
         signal.signal(signal.SIGINT, self.handle_exit_sig)
 
@@ -34,19 +32,13 @@ class YCast:
 
     def handle_exit(self):
         self.player.quit()
-        self.wait_for_all_threads()
+        self.manager.quit()
         with open("config/manager.pkl", "wb") as output:
             pickle.dump(self.manager, output, pickle.HIGHEST_PROTOCOL)
         with open("config/player.pkl", "wb") as output:
             pickle.dump(self.player, output, pickle.HIGHEST_PROTOCOL)
         self.quit = True
         print("Goodbye!")
-
-    def wait_for_all_threads(self):
-        for thread in self.threads:
-            if thread.is_alive():
-                print(f"Waiting for: {thread.name}")
-            thread.join()
     
     def start(self):
         # RT https://roosterteeth.com/show/rt-podcast/feed/mp3
@@ -79,49 +71,20 @@ class YCast:
                     print("Please specify a Podcast to subscribe to!")
                     continue
                 for url in args.split(" "):
-                    t = threading.Thread(target=self.manager.subscribe_to_channel, args=(url,), name=f"Subscribing to {url}") # TODO: Move into manager
-                    t.start()
-                    self.threads.append(t)
+                    self.manager.subscribe_to_channel(url)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 self.get_channel_apply("Unsubscribe", self.manager.unsubscribe_from_channel)
             
             elif cmd == "list" or cmd == "ls":
-                self.wait_for_all_threads()
+                self.manager.wait_for_all_threads()
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
-                # TODO: Use universal function
-                item_indexes = None
-                while item_indexes is None:
-                    channel = self.select_channel("Download")
-                    if channel is not None:
-                        item_indexes = self.select_item_indexes(channel, "Download")
-                        if item_indexes is not None:
-                            for item_index in item_indexes:
-                                item = channel.items[item_index]
-                                logging.info(f"Downloading {item.title}")
-                                t = threading.Thread(target=self.manager.download_item, args=(item, channel), name=f"Downloading {channel.title}: {item.title}") # TODO: Move into manager
-                                t.start()
-                                self.threads.append(t)
-                    else:
-                        break
+                self.get_items_apply("Download", self.manager.download_item)
             
             elif cmd == "delete" or cmd == "del":
-                # TODO: Use universal function
-                item_indexes = None
-                while item_indexes is None:
-                    channel = self.select_channel("Delete")
-                    if channel is not None:
-                        item_indexes = self.select_item_indexes(channel, "Delete")
-                        if item_indexes is not None:
-                            for item_index in item_indexes:
-                                item = channel.items[item_index]
-                                t = threading.Thread(target=self.manager.delete_item, args=(item, channel)) # TODO: Move into manager
-                                t.start()
-                                self.threads.append(t)
-                    else:
-                        break
+                self.get_items_apply("Delete", self.manager.delete_item)
             
             elif cmd == "sync":
                 updates = self.manager.update_all()
