@@ -1,28 +1,30 @@
 Naming:
-    - Podcast or Channel?
-    - Item or Episode?
+    ☐ Podcast or Channel?
+    ☐ Item or Episode?
+
+Code:
+    ☐ Typing
 
 CLI:
-    - Interactive and Dynamic CLI
+    ☐ Interactive and Dynamic CLI
         # Scroll through list of channels and items
-    - Download Progress Bar
-    - Notification on thread completion (Download, subscribe, etc.)
+    ☐ Notification on thread completion (Download, subscribe, etc.)
 
 Player:
-    - Stream Audio
-    - Play audio if it is downloaded, stream it if it is not
-    - Volume Control
-    - Playback Speed
-    - Skip Forward
-    - Skip Backward
-    - Restart
-    - Go to Position
-    - Support Playlists
+    ☐ Full MP3 Support (Downloaded and Streaming)
+    ☐ Play audio if it is downloaded, stream it if it is not
+    ☐ Volume Control
+    ☐ Playback Speed
+    ☐ Skip Forward
+    ☐ Skip Backward
+    ☐ Restart
+    ✔ Go to Position @done(19-01-16 18:53)
+    ☐ Support Playlists
 
 Downloads:
-    - Custom Download Directory
+    ☐ Custom Download Directory
 
 Errors:
-    - Raise Exceptions instead of just printing
+    ☐ Raise Exceptions instead of just printing
         # Handle all printing in the Ycast class
-    - Deal with Input Errors
+    ☐ Deal with Input Errors

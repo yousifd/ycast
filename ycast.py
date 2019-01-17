@@ -116,7 +116,7 @@ class YCast:
         self.manager.show_channels()
         # TODO: Deal with Invalid Inputs
         channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
-        return channels[channel_index]
+        return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
     
     def select_item(self, channel, purpose):
         # TODO: Paginate Results if they are greater than 10 (or some other value)

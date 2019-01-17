@@ -20,9 +20,9 @@ class Player:
     def __init__(self):
         self.mixer = pygame.mixer
         self.mixer.init()
+        self.music = self.mixer.music
 
         self.item = None
-        self.playlist = []
         self.state = self.State.LOADING
     
     def quit(self):
@@ -30,38 +30,31 @@ class Player:
         self.mixer.quit()
 
     def play(self, item, channel):
-        # TODO: Store current position and start from there next time you play
         self.item = item
         if item.downloaded:
             self.play_file(item, channel)
         else: # Stream
+            # TODO: Implement Streaming
             print("Not Downloaded!")
             return
         self.state = self.State.PLAYING
     
     def play_file(self, item, channel):
-        print(f"PLAYING {item.title}")
-        self.mixer.music.load(f"downloads/{channel.title}/{item.title}.mp3")
-        self.mixer.music.play()
+        self.music.load(f"downloads/{channel.title}/{item.title}.mp3")
+        # self.music.set_pos(item.progress/1000)
+        self.music.play(start=item.progress/1000)
     
     def pause(self):
-        # TODO: Track Progress
-        self.mixer.music.pause()
+        self.item.progress += self.music.get_pos()
+        self.music.pause()
         self.state = self.State.PAUSED
     
     def unpause(self):
-        self.mixer.music.unpause()
+        self.music.unpause()
         self.state = self.State.PLAYING
     
     def stop(self):
-        # TODO: Track Progress
-        self.mixer.music.stop()
+        if self.item is not None:
+            self.item.progress += self.music.get_pos()
+        self.music.stop()
         self.state = self.State.STOPPED
-
-    def add_playlist(self, item):
-            # TODO: Verify Source
-        self.playlist.append(item)
-
-    def remove_playlist(self, item):
-        # TODO: Verify Source
-        self.playlist.remove(item)
