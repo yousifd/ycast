@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import os
+import shutil
 import logging
 import pickle
 from datetime import datetime
@@ -62,7 +63,9 @@ class Manager:
             for i, item in enumerate(channel.items):
                 print(f"  {i}) {item.title} ({item.enclosure.url})")
     
-    def download_podcast(self, item, channel):
+    def download_podcast(self, item_index, channel_title):
+        channel = self.channels[self.title_to_url[channel_title]]
+        item = channel.items[item_index]
         if item.downloaded:
             print("Episode has already downloaded!")
             return
@@ -77,12 +80,13 @@ class Manager:
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
         item.downloaded = True
+        # TODO: Notification upon download complete?
 
-    def delete_podcast(self, item):
+    def delete_podcast(self, item, channel):
         if not item.downloaded:
             print("Episode hasn't been downloaded yet!")
             return
-        os.remove(f"downloads/{item.title}.mp3")
+        os.remove(f"downloads/{channel.title}/{item.title}.mp3")
         item.downloaded = False
 
     def update_all(self):
@@ -93,9 +97,9 @@ class Manager:
         # TODO: Check for Updates
         pass
 
-    def unsubscribe_from_podcast(self, channel):
-        # TODO: Unsubscribe
-        # TODO: Remove Already Installed Episodes
+    def unsubscribe_from_podcast(self, channel_title):
+        shutil.rmtree(f"downloads/{channel_title}")
+        del self.channels[self.title_to_url[channel_title]]
         pass
 
     def subscribe_to_podcast(self, url):

@@ -62,7 +62,7 @@ class YCast:
                 channels = list(self.manager.channels.values())
                 self.manager.show_channels()
                 channel_index = int(input("Which Channel do you want to unsubscribe from? "))
-                self.manager.unsubscribe_from_podcast(channels[channel_index])
+                self.manager.unsubscribe_from_podcast(channels[channel_index].title)
             
             elif cmd == "list" or cmd == "ls":
                 # TODO: Pagination
@@ -80,7 +80,7 @@ class YCast:
                 item_indexes = map(int, item_indexes.split(" "))
                 for item_index in item_indexes:
                     item = channel.items[item_index]
-                    t = threading.Thread(target=self.manager.download_podcast, args=(item, channel), name=f"Downloading {channel.title}: {item.title}")
+                    t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel.title), name=f"Downloading {channel.title}: {item.title}")
                     t.start()
                     self.threads.append(t)
             
@@ -92,11 +92,12 @@ class YCast:
                 #     self.manager.delete_podcast(item)
                 pass
             
-            # TODO: Sync cmd updates all channels
+            elif cmd == "sync":
+                self.manager.update_all()
 
             elif cmd == "update" or cmd == "u":
-                # TODO: Only updates a specific channel
-                self.manager.update_all()
+                # TODO: Update Specific Channel
+                pass
 
             elif cmd == "play" or cmd == "p":
                 # TODO: Play Audio: Streamed or Downloaded
@@ -121,3 +122,7 @@ class YCast:
 
             else:
                 print("Invalid Command!")
+
+    def select_channel(self, channels):
+        for i, channel in enumerate(channels):
+            print(f"{i}) {channel}")
