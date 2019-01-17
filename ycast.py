@@ -4,9 +4,11 @@ import logging
 import signal
 import sys
 import threading
+import os
+import pickle
 
 from manager import Manager
-from player import Player
+from player import Player, PlayerInvalidVolumeChange
 
 class YCast:
     def __init__(self):
@@ -16,6 +18,14 @@ class YCast:
         self.threads = []
 
         signal.signal(signal.SIGINT, self.handle_exit_sig)
+
+        if not os.path.exists("config"):
+            os.makedirs("config")
+        else:
+            with open("config/manager.pkl", "rb") as input:
+                self.manager = pickle.load(input)
+            with open("config/player.pkl", "rb") as input:
+                self.player = pickle.load(input)
     
     def handle_exit_sig(self, sig, frame):
         self.handle_exit()
@@ -23,11 +33,14 @@ class YCast:
 
     def handle_exit(self):
         self.player.quit()
-        self.manager.store_channels()
         for thread in self.threads:
             if thread.is_alive():
                 print(f"Waiting for: {thread.name}")
             thread.join()
+        with open("config/manager.pkl", "wb") as output:
+            pickle.dump(self.manager, output, pickle.HIGHEST_PROTOCOL)
+        with open("config/player.pkl", "wb") as output:
+            pickle.dump(self.player, output, pickle.HIGHEST_PROTOCOL)
         self.quit = True
         print("Goodbye!")
     
@@ -40,6 +53,7 @@ class YCast:
             logging.debug(line)
             line = line.split(" ", 1)
             cmd = line[0]
+            args = None
             if len(line) > 1:
                 args = line[1]
 
@@ -55,6 +69,9 @@ class YCast:
                 print(channel.info_str())
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
+                if args is None:
+                    print("Please specify a Podcast to subscribe to!")
+                    continue
                 for url in args.split(" "):
                     t = threading.Thread(target=self.manager.subscribe_to_channel, args=(url,), name=f"Subscribing to {url}")
                     t.start()
@@ -108,9 +125,41 @@ class YCast:
             elif cmd == "quit" or cmd == "q" or cmd == "exit":
                 self.handle_exit()
             
-            # TODO: Set Volume
-            # TODO: Forward
-            # TODO: Backward
+            elif cmd == "volume":
+                if args is None:
+                    print("Please specify volume value!")
+                    continue
+                amount = self.player.volume
+                try:
+                    amount = int(args)
+                except ValueError:
+                    print("Invalid Volume Value")
+                try:
+                    self.player.set_volume(float(amount)/10.0)
+                except PlayerInvalidVolumeChange:
+                    print("Volume Value must be between 0 and 10")
+            
+            elif cmd == "forward":
+                if args is None:
+                    print("Please specify forward skip seconds!")
+                    continue
+                amount = 0
+                try:
+                    amount = int(args)
+                except ValueError:
+                    print("Invalid number of seconds to skip!")
+                self.player.skip_forward(amount)
+            
+            elif cmd == "backward":
+                if args is None:
+                    print("Please specify backward skip seconds!")
+                    continue
+                amount = 0
+                try:
+                    amount = int(args)
+                except ValueError:
+                    print("Invalid number of seconds to skip!")
+                self.player.skip_backward(amount)
 
             # TODO: Play Queue Support
                 # TODO: Skip Current Episode

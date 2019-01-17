@@ -2,7 +2,6 @@ import xml.etree.ElementTree as ET
 import os
 import shutil
 import logging
-import pickle
 from datetime import datetime
 
 import requests
@@ -33,23 +32,22 @@ class Manager:
         self.title_to_url = {}
 
         if not os.path.exists("downloads"):
-            os.makedirs("downloads")
-
-        if not os.path.exists("config"):
-            os.makedirs("config")
-        else:
-            with open("config/channels.pkl", "rb") as input:
-                self.channels = pickle.load(input)
-            # Check if downloaded file has been deleted since last time
-            for url, channel in self.channels.items():
-                self.title_to_url[channel.title] = url
-                for item in channel.items:
-                    if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
-                        item.downloaded = False
-
-    def store_channels(self):
-        with open('config/channels.pkl', "wb") as output:
-            pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
+            os.makedirs("downloads")         
+    
+    def __getstate__(self):
+        d = dict(self.__dict__)
+        del d['title_to_url']
+        return d
+    
+    def __setstate__(self, d):
+        self.__dict__.update(d)
+        self.title_to_url = {}
+        # Check if downloaded file has been deleted since last time
+        for url, channel in self.channels.items():
+            self.title_to_url[channel.title] = url
+            for item in channel.items:
+                if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
+                    item.downloaded = False
     
     def download_item(self, item_index, channel):
         channel = self.channels[self.title_to_url[channel.title]]
@@ -86,7 +84,8 @@ class Manager:
         pass
 
     def unsubscribe_from_channel(self, channel_title):
-        shutil.rmtree(f"downloads/{channel_title}")
+        if os.path.exists(f"downloads/{channel_title}"):
+            shutil.rmtree(f"downloads/{channel_title}")
         del self.channels[self.title_to_url[channel_title]]
 
     def subscribe_to_channel(self, url):
