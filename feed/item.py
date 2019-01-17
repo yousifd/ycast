@@ -1,3 +1,5 @@
+import html2text
+
 class Item:
     def __init__(self):
         # Spec
@@ -18,6 +20,7 @@ class Item:
         self.progress = 0
     
     def info_str(self):
+        h = html2text.HTML2Text()
         res = []
         res.append(f"{self.title} ({self.enclosure.url})\n")
         if self.author:
@@ -34,7 +37,7 @@ class Item:
             res.append(f"GUID: {self.guid}\n")
         if self.comments:
             res.append(f"Comments: {self.comments}\n")
-        res.append(f"Description: {self.description}\n") # TODO: Parse HTML
+        res.append(f"Description: {h.handle(self.description)}\n")
         res.append(f"Downloaded: {self.downloaded}")
         return "".join(res)
     

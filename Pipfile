@@ -11,6 +11,7 @@ autopep8 = "*"
 requests = "*"
 pygame = "*"
 python-dateutil = "*"
+html2text = "*"
 
 [requires]
 python_version = "3.7"
