@@ -13,13 +13,7 @@ CLI:
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming)
     ☐ Play audio if it is downloaded, stream it if it is not
-    ☐ Volume Control
     ☐ Playback Speed
-    ☐ Skip Forward
-    ☐ Skip Backward
-    ☐ Restart
-    ✔ Go to Position @done(19-01-16 18:53)
-    ☐ Support Playlists
 
 Downloads:
     ☐ Custom Download Directory

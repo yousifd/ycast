@@ -16,6 +16,10 @@ from feed.source import Source
 from feed.cloud import Cloud
 from feed.image import Image
 from feed.textinput import TextInput
+from exceptions import YCastException
+
+class ManagerException(YCastException):
+    pass
 
 class Manager:
     def __init__(self):
@@ -64,7 +68,7 @@ class Manager:
             channel = pair[1]
             print(f"{i}) {channel.title}")
             for i, item in enumerate(channel.items):
-                print(f"  {i}) {item.title} ({item.enclosure.url})")
+                print(f"  {i}) {item.downloaded} {item.title} ({item.enclosure.url})")
     
     def download_podcast(self, item_index, channel):
         channel = self.channels[self.title_to_url[channel.title]]
