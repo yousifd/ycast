@@ -56,6 +56,8 @@ class Manager:
             print(f"Episode {item.title} has already been downloaded")
             return
 
+        # TODO: Avoid race conditions when downloading multiple episodes
+            # by having threading be on the file write part and not the whole function call
         if not os.path.exists(f"downloads/{channel.title}"):
             os.makedirs(f"downloads/{channel.title}")
         url = item.enclosure.url

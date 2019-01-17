@@ -87,11 +87,3 @@ class Player:
             raise PlayerInvalidVolumeChange
         self.volume = amount
         self.music.set_volume(self.volume)
-
-    def skip_forward(self, amount):
-        # TODO: Support forward skipping
-        pass
-    
-    def skip_backward(self, amount):
-        # TODO: Support backward Skipping
-        pass

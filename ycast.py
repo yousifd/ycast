@@ -9,6 +9,7 @@ import pickle
 
 from manager import Manager
 from player import Player, PlayerInvalidVolumeChange
+from paginator import Paginator, FirstPageException, LastPageException
 
 class YCast:
     def __init__(self):
@@ -63,13 +64,13 @@ class YCast:
 
             elif cmd == "":
                 continue
-            
 
             # TODO: Channel Info
             # TODO: Item Info
             elif cmd == "info" or cmd == "i":
                 channel = self.select_channel("Info")
-                print(channel.info_str())
+                if channel is not None:
+                    print(channel.info_str())
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 if args is None:
@@ -82,39 +83,52 @@ class YCast:
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 channel = self.select_channel("Unsubscribe")
-                self.manager.unsubscribe_from_channel(channel.title)
+                if channel is not None:
+                    self.manager.unsubscribe_from_channel(channel.title)
             
             elif cmd == "list" or cmd == "ls":
+                # TODO: Wait for all subscribe threads to finish first
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
                 channel = self.select_channel("Download")
-                for item_index in self.select_item_indexes(channel, "Download"):
-                    item = channel.items[item_index]
-                    logging.info(f"Downloading {item.title}")
-                    t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
-                    t.start()
-                    self.threads.append(t)
+                if channel is not None:
+                    item_indexes = self.select_item_indexes(channel, "Download")
+                    if item_indexes is not None:
+                        for item_index in item_indexes:
+                            item = channel.items[item_index]
+                            logging.info(f"Downloading {item.title}")
+                            t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
+                            t.start()
+                            self.threads.append(t)
             
             elif cmd == "delete" or cmd == "del":
                 channel = self.select_channel("Delete")
-                for item_index in self.select_item_indexes(channel, "Delete"):
-                    item = channel.items[item_index]
-                    t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
-                    t.start()
-                    self.threads.append(t)
+                if channel is not None:
+                    item_indexes = self.select_item_indexes(channel, "Delete")
+                    if item_indexes is not None:
+                        for item_index in item_indexes:
+                            item = channel.items[item_index]
+                            t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
+                            t.start()
+                            self.threads.append(t)
             
             elif cmd == "sync":
                 self.manager.update_all()
 
             elif cmd == "update" or cmd == "u":
                 channel = self.select_channel("Update")
-                self.manager.update(channel)
+                if channel is not None:
+                    self.manager.update(channel)
 
             elif cmd == "play" or cmd == "p":
+                # TODO: Ability to go back to channels list
                 channel = self.select_channel("Play")
-                item = channel.items[self.select_item(channel, "Play")]
-                self.player.play(item, channel)
+                if channel is not None:
+                    item_index = self.select_item(channel, "Play")
+                    if item_index is not None:
+                        item = channel.items[item_index]
+                        self.player.play(item, channel)
 
             elif cmd == "pause":
                 self.player.pause()
@@ -141,28 +155,6 @@ class YCast:
                     self.player.set_volume(float(amount)/10.0)
                 except PlayerInvalidVolumeChange:
                     print("Volume Value must be between 0 and 10")
-            
-            # elif cmd == "forward":
-            #     if args is None:
-            #         print("Please specify forward skip seconds!")
-            #         continue
-            #     amount = 0
-            #     try:
-            #         amount = int(args)
-            #     except ValueError:
-            #         print("Invalid number of seconds to skip!")
-            #     self.player.skip_forward(amount)
-            
-            # elif cmd == "backward":
-            #     if args is None:
-            #         print("Please specify backward skip seconds!")
-            #         continue
-            #     amount = 0
-            #     try:
-            #         amount = int(args)
-            #     except ValueError:
-            #         print("Invalid number of seconds to skip!")
-            #     self.player.skip_backward(amount)
 
             # TODO: Play Queue Support
                 # TODO: Skip Current Episode
@@ -174,7 +166,7 @@ class YCast:
                 print("Invalid Command!")
 
     def show_all(self):
-        # TODO: Pagination
+        # TODO: Choose Channel then browse items under channel
         if not self.manager.channels.keys():
             print("No Podcasts Available Yet!")
             return
@@ -184,84 +176,120 @@ class YCast:
             print(f"{i}) {channel.title}")
             for i, item in enumerate(channel.items):
                 print(
-                    f"  {i}) {item.downloaded} {item.title} ({item.enclosure.url})")
-    
-    def show_items(self, channel):
-        if channel.title not in self.manager.title_to_url:
-            print(f"Podcast {channel.title} doesn't Exist!")
-            return
-        print(f"{channel.title}")
-        for i, item in enumerate(channel.items):
-            print(f"  {i}) {item.title} ({item.enclosure.url})")
-
-    def show_channels(self):
-        if not self.manager.channels.keys():
-            print("No Podcasts Available Yet!")
-            return
-        for i, pair in enumerate(self.manager.channels.items()):
-            channel = pair[1]
-            print(f"{i}) {channel.title}")
+                    f"  {i}) {item.title} ({item.enclosure.url})")
 
     def select_channel(self, purpose):
+        channels = list(self.manager.channels.values())
+        paginator = Paginator(channels, 0, len(channels), 10)
+
+        if len(channels) == 0:
+            print("No Podcasts Available Yet!")
+            return
+
         while True:
+            for i, channel in enumerate(paginator.get_current_page()):
+                print(f"{i+paginator.current_min}) {channel.title}")
 
-            # TODO: Paginate Results if they are greater than 10 (or some other value)
-            channels = list(self.manager.channels.values())
-            self.show_channels()
+            channel_index = input(f"Which Channel do you want to {purpose} from? ")
+            if channel_index == "n":
+                try:
+                    paginator.get_next()
+                except LastPageException:
+                    print("Last Page")
+            elif channel_index == "b":
+                try:
+                    paginator.get_prev()
+                except FirstPageException:
+                    print("First Page")
+            elif channel_index == "q":
+                break
+            else:
+                try:
+                    channel_index = int(channel_index)
+                except ValueError:
+                    print("Invalid Input!")
+                    continue
 
-            try:
-                channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
-            except ValueError:
-                print("Invalid Input!")
-                continue
+                if channel_index > len(self.manager.channels.keys()) or channel_index < 0:
+                    print(f"Option must be between {0} and {len(self.manager.channels.keys())}")
+                    continue
 
-            if channel_index > len(self.manager.channels.keys()) or channel_index < 0:
-                print(f"Option must be between {0} and {len(self.manager.channels.keys())}")
-                continue
-
-            return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
+                return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
     
     def select_item(self, channel, purpose):
+        items = channel.items
+        paginator = Paginator(items, 0, len(items), 10)
+
         while True:
+            print(channel.title)
+            for i, item in enumerate(paginator.get_current_page()):
+                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url})")
 
-            # TODO: Paginate Results if they are greater than 10 (or some other value)
-            self.show_items(channel)
+            item_index = input(f"Which item do you want to {purpose}? ")
+            if item_index == "n":
+                try:
+                    paginator.get_next()
+                except LastPageException:
+                    print("Last Page")
+            elif item_index == "b":
+                try:
+                    paginator.get_prev()
+                except FirstPageException:
+                    print("First Page")
+            elif item_index == "q":
+                break
+            else:
+                try:
+                    item_index = int(item_index)
+                except ValueError:
+                    print("Invalid Input!")
+                    continue
 
-            try:
-                item_index = int(input(f"Which item do you want to {purpose}? "))
-            except ValueError:
-                print("Invalid Input!")
-                continue
+                if item_index > len(channel.items) or item_index < 0:
+                    print(f"Option must be between {0} and {len(channel.items)-1}")
+                    continue
 
-            if item_index > len(channel.items) or item_index < 0:
-                print(f"Option must be between {0} and {len(channel.items)-1}")
-                continue
-
-            return item_index
+                return item_index
 
     def select_item_indexes(self, channel, purpose):
+        items = channel.items
+        paginator = Paginator(items, 0, len(items), 10)
+
         cont = True
         while cont:
-
             cont = False
-            # TODO: Paginate Results if they are greater than 10 (or some other value)
-            self.show_items(channel)
+            for i, item in enumerate(paginator.get_current_page()):
+                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url})")
+
             item_indexes = input(f"Which Items do you want {purpose}? ")
-
-            try:
-                item_indexes = list(map(int, item_indexes.split(" ")))
-            except ValueError:
-                print("Invalid Input!")
-                cont = True
-                continue
-
-            for i in item_indexes:
-                if i > len(channel.items) or i < 0:
-                    print(f"Options must be between {0} and {len(channel.items)-1}")
+            if item_indexes == "n":
+                try:
+                    paginator.get_next()
+                except LastPageException:
+                    print("Last Page")
+            elif item_indexes == "b":
+                try:
+                    paginator.get_prev()
+                except FirstPageException:
+                    print("First Page")
+            elif item_indexes == "q":
+                break
+            else:
+                try:
+                    item_indexes = list(map(int, item_indexes.split(" ")))
+                except ValueError:
+                    print("Invalid Input!")
                     cont = True
-                    break
+                    continue
 
-        return item_indexes
+                for i in item_indexes:
+                    if i > len(channel.items) or i < 0:
+                        print(f"Options must be between {0} and {len(channel.items)-1}")
+                        cont = True
+                        break
+
+                return item_indexes
+            cont = True
 
 if __name__ == "__main__":
     cast = YCast()

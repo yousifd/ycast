@@ -4,11 +4,15 @@ CLI:
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
     ☐ Play audio if it is downloaded, stream it if it is not @created(19-01-16 23:29)
-    ☐ Playback Speed @created(19-01-16 23:29)
-
+    ☐ Playback Speed @created(19-01-17 00:18)
+    ☐ Ability to skip forwards and backwards @created(19-01-17 00:18)
+    
 Errors:
     ☐ Raise Exceptions instead of just printing @created(19-01-16 23:29)
         Handle all printing in the Ycast class
 
 Project:
     ☐ README @created(19-01-16 23:29)
+
+Paginator:
+    ☐ Modularize a bit more @created(19-01-17 01:30)
