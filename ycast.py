@@ -64,6 +64,9 @@ class YCast:
             elif cmd == "":
                 continue
             
+
+            # TODO: Channel Info
+            # TODO: Item Info
             elif cmd == "info" or cmd == "i":
                 channel = self.select_channel("Info")
                 print(channel.info_str())
@@ -139,27 +142,27 @@ class YCast:
                 except PlayerInvalidVolumeChange:
                     print("Volume Value must be between 0 and 10")
             
-            elif cmd == "forward":
-                if args is None:
-                    print("Please specify forward skip seconds!")
-                    continue
-                amount = 0
-                try:
-                    amount = int(args)
-                except ValueError:
-                    print("Invalid number of seconds to skip!")
-                self.player.skip_forward(amount)
+            # elif cmd == "forward":
+            #     if args is None:
+            #         print("Please specify forward skip seconds!")
+            #         continue
+            #     amount = 0
+            #     try:
+            #         amount = int(args)
+            #     except ValueError:
+            #         print("Invalid number of seconds to skip!")
+            #     self.player.skip_forward(amount)
             
-            elif cmd == "backward":
-                if args is None:
-                    print("Please specify backward skip seconds!")
-                    continue
-                amount = 0
-                try:
-                    amount = int(args)
-                except ValueError:
-                    print("Invalid number of seconds to skip!")
-                self.player.skip_backward(amount)
+            # elif cmd == "backward":
+            #     if args is None:
+            #         print("Please specify backward skip seconds!")
+            #         continue
+            #     amount = 0
+            #     try:
+            #         amount = int(args)
+            #     except ValueError:
+            #         print("Invalid number of seconds to skip!")
+            #     self.player.skip_backward(amount)
 
             # TODO: Play Queue Support
                 # TODO: Skip Current Episode

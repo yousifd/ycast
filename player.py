@@ -24,6 +24,7 @@ class Player:
         self.init_mixer()
         self.volume = self.music.get_volume()
 
+        # TODO: Reset item.position upon episode completion
         self.item = None
         self.queue = [] # TODO: Implmenet Play Queue
         self.state = self.State.LOADING
@@ -87,19 +88,10 @@ class Player:
         self.volume = amount
         self.music.set_volume(self.volume)
 
-    # TODO: Fix
     def skip_forward(self, amount):
-        if not self.music.get_busy():
-            print("No Episode is playing right now!")
-        print(self.music.get_pos())
-        self.music.set_pos(float(amount*1000))
-        print(self.music.get_pos())
+        # TODO: Support forward skipping
+        pass
     
-    # TODO: Fix
     def skip_backward(self, amount):
-        if not self.music.get_busy():
-            print("No Episode is playing right now!")
-        cur_pos = (self.music.get_pos()/1000)
-        print(f"{amount} {cur_pos}")
-        self.music.set_pos(cur_pos-amount)
-        print(f"{self.music.get_pos()}")
+        # TODO: Support backward Skipping
+        pass

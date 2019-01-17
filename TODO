@@ -1,13 +1,14 @@
 CLI:
-    ☐ Interactive and Dynamic CLI
-        # Scroll through list of channels and items
-    ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.)
+    ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
 
 Player:
-    ☐ Full MP3 Support (Downloaded and Streaming)
-    ☐ Play audio if it is downloaded, stream it if it is not
-    ☐ Playback Speed
+    ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
+    ☐ Play audio if it is downloaded, stream it if it is not @created(19-01-16 23:29)
+    ☐ Playback Speed @created(19-01-16 23:29)
 
 Errors:
-    ☐ Raise Exceptions instead of just printing
+    ☐ Raise Exceptions instead of just printing @created(19-01-16 23:29)
         Handle all printing in the Ycast class
+
+Project:
+    ☐ README @created(19-01-16 23:29)
