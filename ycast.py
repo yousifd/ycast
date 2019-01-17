@@ -68,12 +68,17 @@ class YCast:
             elif cmd == "":
                 continue
 
-            # TODO: Channel Info
-            # TODO: Item Info
-            elif cmd == "info" or cmd == "i":
+            elif cmd == "cinfo" or cmd == "ci":
                 channel = self.select_channel("Info")
                 if channel is not None:
                     print(channel.info_str())
+            
+            elif cmd == "iinfo" or cmd == "ii":
+                channel = self.select_channel("Info")
+                if channel is not None:
+                    item_index = self.select_item(channel, "Info")
+                    if item_index is not None:
+                        print(channel.items[item_index].info_str())
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 if args is None:
@@ -159,9 +164,6 @@ class YCast:
                 except PlayerInvalidVolumeChange:
                     print("Volume Value must be between 0 and 10")
 
-            # TODO: Play Queue Support
-                # TODO: Skip Current Episode
-
             elif cmd == "restart":
                 self.player.restart()
 
@@ -226,7 +228,7 @@ class YCast:
         while True:
             print(channel.title)
             for i, item in enumerate(paginator.get_current_page()):
-                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url})")
+                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
 
             item_index = input(f"Which item do you want to {purpose}? ")
             if item_index == "n":
@@ -262,7 +264,7 @@ class YCast:
         while cont:
             cont = False
             for i, item in enumerate(paginator.get_current_page()):
-                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url})")
+                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
 
             item_indexes = input(f"Which Items do you want {purpose}? ")
             if item_indexes == "n":
