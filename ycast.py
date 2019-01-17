@@ -51,8 +51,8 @@ class YCast:
                 continue
             
             elif cmd == "info" or cmd == "i":
-                # TODO: Print Channel Info
-                pass
+                channel = self.select_channel("Info")
+                print(channel.info_str())
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in args.split(" "):
@@ -65,8 +65,7 @@ class YCast:
                 self.manager.unsubscribe_from_channel(channel.title)
             
             elif cmd == "list" or cmd == "ls":
-                # TODO: Pagination
-                self.manager.show_all()
+                self.show_all()
             
             elif cmd == "download" or cmd == "d":
                 channel = self.select_channel("Download")
@@ -110,7 +109,11 @@ class YCast:
                 self.handle_exit()
             
             # TODO: Set Volume
-            # TODO: Skip
+            # TODO: Forward
+            # TODO: Backward
+
+            # TODO: Play Queue Support
+                # TODO: Skip Current Episode
 
             elif cmd == "restart":
                 self.player.restart()
@@ -118,12 +121,41 @@ class YCast:
             else:
                 print("Invalid Command!")
 
+    def show_all(self):
+        # TODO: Pagination
+        if not self.manager.channels.keys():
+            print("No Podcasts Available Yet!")
+            return
+        
+        for i, pair in enumerate(self.manager.channels.items()):
+            channel = pair[1]
+            print(f"{i}) {channel.title}")
+            for i, item in enumerate(channel.items):
+                print(
+                    f"  {i}) {item.downloaded} {item.title} ({item.enclosure.url})")
+    
+    def show_items(self, channel):
+        if channel.title not in self.manager.title_to_url:
+            print(f"Podcast {channel.title} doesn't Exist!")
+            return
+        print(f"{channel.title}")
+        for i, item in enumerate(channel.items):
+            print(f"  {i}) {item.title} ({item.enclosure.url})")
+
+    def show_channels(self):
+        if not self.manager.channels.keys():
+            print("No Podcasts Available Yet!")
+            return
+        for i, pair in enumerate(self.manager.channels.items()):
+            channel = pair[1]
+            print(f"{i}) {channel.title}")
+
     def select_channel(self, purpose):
         while True:
 
             # TODO: Paginate Results if they are greater than 10 (or some other value)
             channels = list(self.manager.channels.values())
-            self.manager.show_channels()
+            self.show_channels()
 
             try:
                 channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
@@ -141,7 +173,7 @@ class YCast:
         while True:
 
             # TODO: Paginate Results if they are greater than 10 (or some other value)
-            self.manager.show_items(channel)
+            self.show_items(channel)
 
             try:
                 item_index = int(input(f"Which item do you want to {purpose}? "))
@@ -161,7 +193,7 @@ class YCast:
 
             cont = False
             # TODO: Paginate Results if they are greater than 10 (or some other value)
-            self.manager.show_items(channel)
+            self.show_items(channel)
             item_indexes = input(f"Which Items do you want {purpose}? ")
 
             try:

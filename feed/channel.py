@@ -22,7 +22,9 @@ class Channel:
         self.skipHours = ""
         self.skipDays = ""
 
-        # Internal
+    def info_str(self):
+        # TODO: String of Information
+        pass
 
     def __str__(self):
         return self.title

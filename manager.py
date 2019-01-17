@@ -50,35 +50,6 @@ class Manager:
     def store_channels(self):
         with open('config/channels.pkl', "wb") as output:
             pickle.dump(self.channels, output, pickle.HIGHEST_PROTOCOL)
-
-    def show_items(self, channel):
-        # TODO: Move to ycast.py
-        if channel.title  not in self.title_to_url:
-            print(f"Podcast {channel.title} doesn't Exist!")
-            return
-        print(f"{channel.title}")
-        for i, item in enumerate(channel.items):
-            print(f"  {i}) {item.title} ({item.enclosure.url})")
-
-    def show_channels(self):
-        # TODO: Move to ycast.py
-        if not self.channels.keys():
-            print("No Podcasts Available Yet!")
-            return
-        for i, pair in enumerate(self.channels.items()):
-            channel = pair[1]
-            print(f"{i}) {channel.title}")
-    
-    def show_all(self):
-        # TODO: Move to ycast.py
-        if not self.channels.keys():
-            print("No Podcasts Available Yet!")
-            return
-        for i, pair in enumerate(self.channels.items()):
-            channel = pair[1]
-            print(f"{i}) {channel.title}")
-            for i, item in enumerate(channel.items):
-                print(f"  {i}) {item.downloaded} {item.title} ({item.enclosure.url})")
     
     def download_item(self, item_index, channel):
         channel = self.channels[self.title_to_url[channel.title]]
@@ -102,6 +73,7 @@ class Manager:
         if not item.downloaded:
             print(f"Episode {item.title} hasn't been downloaded yet!")
             return
+
         os.remove(f"downloads/{channel.title}/{item.title}.mp3")
         item.downloaded = False
 
@@ -116,7 +88,6 @@ class Manager:
     def unsubscribe_from_channel(self, channel_title):
         shutil.rmtree(f"downloads/{channel_title}")
         del self.channels[self.title_to_url[channel_title]]
-        pass
 
     def subscribe_to_channel(self, url):
         if url in self.channels:

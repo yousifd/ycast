@@ -8,9 +8,6 @@ Player:
     ☐ Play audio if it is downloaded, stream it if it is not
     ☐ Playback Speed
 
-Downloads:
-    ☐ Custom Download Directory
-
 Errors:
     ☐ Raise Exceptions instead of just printing
-        # Handle all printing in the Ycast class
+        Handle all printing in the Ycast class
