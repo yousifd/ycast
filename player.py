@@ -26,6 +26,7 @@ class Player:
 
         self.item = None
         self.state = self.State.LOADING
+        self.q = list()
     
     def __getstate__(self):
         d = dict(self.__dict__)
@@ -47,13 +48,15 @@ class Player:
         self.stop()
         self.mixer.quit()
 
-    def play(self, item, channel):
+    def play(self, items, channel):
         if self.item is not None:
             self.stop()
-        self.item = item
-        if item.downloaded:
-            self.play_file(item, channel)
+        self.item = items[0]
+        if self.item.downloaded:
+            self.play_file(self.item, channel)
         self.state = self.State.PLAYING
+        for item in items[1:]:
+            self.q.append(item)
     
     def play_file(self, item, channel):
         self.music.load(f"downloads/{channel.title}/{item.title}.mp3")

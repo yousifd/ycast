@@ -72,7 +72,7 @@ class YCast:
                 self.get_channel_apply("Info", lambda c: print(c.info_str()))
             
             elif cmd == "iinfo" or cmd == "ii":
-                self.get_item_apply("Info", lambda i, c: print(i.info_str()))
+                self.get_items_apply("Info", lambda i, c: print(i.info_str()))
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 if args is None:
@@ -131,7 +131,7 @@ class YCast:
                 self.get_channel_apply("Update", self.update_channel)
 
             elif cmd == "play" or cmd == "p":
-                self.get_item_apply("Play", self.player.play)
+                self.get_items_apply("Play", self.player.play)
 
             elif cmd == "pause":
                 self.player.pause()
@@ -205,18 +205,6 @@ class YCast:
         channel = self.select_channel(purpose)
         if channel is not None:
             action(channel)
-    
-    def get_item_apply(self, purpose, action):
-        item_index = None
-        while item_index is None:
-            channel = self.select_channel(purpose)
-            if channel is not None:
-                item_index = self.select_item(channel, purpose)
-                if item_index is not None:
-                    item = channel.items[item_index]
-                    action(item, channel)
-            else:
-                break
     
     def get_items_apply(self, purpose, action):
         item_indexes = None
