@@ -77,6 +77,7 @@ class YCast:
                         print("Podcast {url} already subscribed to!")
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
+                self.manager.wait_for_all_threads()
                 self.get_channel_apply("Unsubscribe", self.manager.unsubscribe_from_channel)
             
             elif cmd == "list" or cmd == "ls":
@@ -90,6 +91,7 @@ class YCast:
                     print("Episode has already been downloaded")
             
             elif cmd == "delete" or cmd == "del":
+                self.manager.wait_for_all_threads()
                 try:
                     self.get_items_apply("Delete", self.manager.delete_item)
                 except ManagerNotDownloaded:
@@ -101,8 +103,14 @@ class YCast:
 
             elif cmd == "update" or cmd == "u":
                 self.get_channel_apply("Update", self.update_channel)
+            
+            elif cmd == "quit" or cmd == "q" or cmd == "exit":
+                self.handle_exit()
+            
+            # Playback Commands
 
             elif cmd == "play" or cmd == "p":
+                self.manager.wait_for_all_threads()
                 self.get_items_apply("Play", self.player.play)
 
             elif cmd == "pause":
@@ -114,8 +122,8 @@ class YCast:
             elif cmd == "stop":
                 self.player.stop()
             
-            elif cmd == "quit" or cmd == "q" or cmd == "exit":
-                self.handle_exit()
+            elif cmd == "restart":
+                self.player.restart()
             
             elif cmd == "volume":
                 if args is None:
@@ -132,9 +140,6 @@ class YCast:
                     self.player.set_volume(float(amount)/10.0)
                 except PlayerInvalidVolumeChange:
                     print("Volume Value must be between 0 and 10")
-
-            elif cmd == "restart":
-                self.player.restart()
 
             else:
                 print("Invalid Command!")
@@ -229,42 +234,6 @@ class YCast:
                     continue
 
                 return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
-    
-    def select_item(self, channel, purpose):
-        items = channel.items
-        paginator = Paginator(items)
-
-        while True:
-            print(channel.title)
-            for i, item in enumerate(paginator.get_current_page()):
-                print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
-
-            item_index = input(f"Which item do you want to {purpose}? ")
-            if item_index == "n":
-                try:
-                    paginator.get_next()
-                except LastPageException:
-                    print("Last Page")
-            elif item_index == "p":
-                try:
-                    paginator.get_prev()
-                except FirstPageException:
-                    print("First Page")
-            elif item_index == "q":
-                item_index = None
-                break
-            else:
-                try:
-                    item_index = int(item_index)
-                except ValueError:
-                    print("Invalid Input!")
-                    continue
-
-                if item_index > len(channel.items) or item_index < 0:
-                    print(f"Option must be between {0} and {len(channel.items)-1}")
-                    continue
-
-                return item_index
 
     def select_item_indexes(self, channel, purpose):
         items = channel.items

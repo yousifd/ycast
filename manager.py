@@ -50,7 +50,7 @@ class Manager:
         self.__dict__.update(d)
         self.title_to_url = {}
         self.threads = []
-        # Check if downloaded file has been deleted since last time
+        # Check if a downloaded file has been deleted since last time
         for url, channel in self.channels.items():
             self.title_to_url[channel.title] = url
             for item in channel.items:
