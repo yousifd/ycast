@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 import logging
 import signal
 import sys
@@ -138,3 +140,7 @@ class YCast:
         item_indexes = input(f"Which Items do you want {purpose}? ")
         item_indexes = map(int, item_indexes.split(" "))
         return item_indexes
+
+if __name__ == "__main__":
+    cast = YCast()
+    cast.start()
