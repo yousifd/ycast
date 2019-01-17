@@ -173,27 +173,41 @@ class YCast:
                 print("Invalid Command!")
 
     def show_all(self):
-        # TODO: Choose Channel then browse items under channel
-        if not self.manager.channels.keys():
-            print("No Podcasts Available Yet!")
-            return
-        
-        for i, pair in enumerate(self.manager.channels.items()):
-            channel = pair[1]
-            print(f"{i}) {channel.title}")
-            for i, item in enumerate(channel.items):
-                print(
-                    f"  {i}) {item.title} ({item.enclosure.url})")
+        channel = self.select_channel("List")
+        if channel is not None:
+            paginator = Paginator(channel.items)
+
+            while True:
+                print(channel.title)
+                for i, item in enumerate(paginator.get_current_page()):
+                    print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
+
+                item_index = input(f"browse> ")
+                if item_index == "n":
+                    try:
+                        paginator.get_next()
+                    except LastPageException:
+                        print("Last Page")
+                elif item_index == "b":
+                    try:
+                        paginator.get_prev()
+                    except FirstPageException:
+                        print("First Page")
+                elif item_index == "q":
+                    break
+                else:
+                    print("Invalid Command!")
 
     def select_channel(self, purpose):
         channels = list(self.manager.channels.values())
-        paginator = Paginator(channels, 0, len(channels))
+        paginator = Paginator(channels)
 
         if len(channels) == 0:
             print("No Podcasts Available Yet!")
             return
 
         while True:
+            print(paginator.get_current_page())
             for i, channel in enumerate(paginator.get_current_page()):
                 print(f"{i+paginator.current_min}) {channel.title}")
 
@@ -225,7 +239,7 @@ class YCast:
     
     def select_item(self, channel, purpose):
         items = channel.items
-        paginator = Paginator(items, 0, len(items))
+        paginator = Paginator(items)
 
         while True:
             print(channel.title)
@@ -260,7 +274,7 @@ class YCast:
 
     def select_item_indexes(self, channel, purpose):
         items = channel.items
-        paginator = Paginator(items, 0, len(items))
+        paginator = Paginator(items)
 
         cont = True
         while cont:

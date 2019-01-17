@@ -8,13 +8,13 @@ class LastPageException(PaginatorException):
     pass
 
 class Paginator:
-        def __init__(self, entries, min_index, max_index, jump_length=10):
+        def __init__(self, entries, jump_length=10):
             self.entries = entries
-            self.min_index = min_index
-            self.max_index = max_index
+            self.min_index = 0
+            self.max_index = len(entries)
             self.jump_length = jump_length
-            self.current_min = min_index
-            self.current_max = jump_length if max_index > jump_length else max_index
+            self.current_min = self.min_index
+            self.current_max = jump_length if self.max_index > jump_length else self.max_index
 
         def get_current_page(self):
             return self.entries[self.current_min:self.current_max]
