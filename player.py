@@ -41,7 +41,7 @@ class Player:
         if item.downloaded:
             self.play_file(item, channel)
         else: # Stream
-            print("Not Downloaded!")
+            print("Episode Not Downloaded!")
             return
         self.state = self.State.PLAYING
     

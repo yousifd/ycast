@@ -54,7 +54,7 @@ class Manager:
     def show_items(self, channel):
         # TODO: Move to ycast.py
         if channel.title  not in self.title_to_url:
-            print(f"Channel {channel.title} doesn't Exist!")
+            print(f"Podcast {channel.title} doesn't Exist!")
             return
         print(f"{channel.title}")
         for i, item in enumerate(channel.items):
@@ -63,7 +63,7 @@ class Manager:
     def show_channels(self):
         # TODO: Move to ycast.py
         if not self.channels.keys():
-            print("No Podcasts Yet!")
+            print("No Podcasts Available Yet!")
             return
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
@@ -72,7 +72,7 @@ class Manager:
     def show_all(self):
         # TODO: Move to ycast.py
         if not self.channels.keys():
-            print("No Podcasts Yet!")
+            print("No Podcasts Available Yet!")
             return
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
@@ -80,7 +80,7 @@ class Manager:
             for i, item in enumerate(channel.items):
                 print(f"  {i}) {item.downloaded} {item.title} ({item.enclosure.url})")
     
-    def download_podcast(self, item_index, channel):
+    def download_item(self, item_index, channel):
         channel = self.channels[self.title_to_url[channel.title]]
         item = channel.items[item_index]
         if item.downloaded:
@@ -98,7 +98,7 @@ class Manager:
                 file.write(chunk)
         item.downloaded = True
 
-    def delete_podcast(self, item, channel):
+    def delete_item(self, item, channel):
         if not item.downloaded:
             print(f"Episode {item.title} hasn't been downloaded yet!")
             return
@@ -113,14 +113,14 @@ class Manager:
         # TODO: Check for Updates
         pass
 
-    def unsubscribe_from_podcast(self, channel_title):
+    def unsubscribe_from_channel(self, channel_title):
         shutil.rmtree(f"downloads/{channel_title}")
         del self.channels[self.title_to_url[channel_title]]
         pass
 
-    def subscribe_to_podcast(self, url):
+    def subscribe_to_channel(self, url):
         if url in self.channels:
-            print(f"Channel {url} already subscribed to!")
+            print(f"Podcast {url} already subscribed to!")
             return
         r = requests.get(url)
         logging.debug(r.text)

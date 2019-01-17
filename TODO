@@ -1,14 +1,7 @@
-Naming:
-    ☐ Podcast or Channel?
-    ☐ Item or Episode?
-
-Code:
-    ☐ Typing
-
 CLI:
     ☐ Interactive and Dynamic CLI
         # Scroll through list of channels and items
-    ☐ Notification on thread completion (Download, subscribe, etc.)
+    ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.)
 
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming)

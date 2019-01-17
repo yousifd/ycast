@@ -45,24 +45,24 @@ class YCast:
 
             if cmd == "help" or cmd == "?":
                 # TODO: Print Usage
-                print("HELP")
+                pass
 
             elif cmd == "":
                 continue
             
             elif cmd == "info" or cmd == "i":
-                # TODO: Print Podcast Info
+                # TODO: Print Channel Info
                 pass
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 for url in args.split(" "):
-                    t = threading.Thread(target=self.manager.subscribe_to_podcast, args=(url,), name=f"Subscribing to {url}")
+                    t = threading.Thread(target=self.manager.subscribe_to_channel, args=(url,), name=f"Subscribing to {url}")
                     t.start()
                     self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 channel = self.select_channel("Unsubscribe")
-                self.manager.unsubscribe_from_podcast(channel.title)
+                self.manager.unsubscribe_from_channel(channel.title)
             
             elif cmd == "list" or cmd == "ls":
                 # TODO: Pagination
@@ -70,11 +70,10 @@ class YCast:
             
             elif cmd == "download" or cmd == "d":
                 channel = self.select_channel("Download")
-                print("DOWNLOADING")
                 for item_index in self.select_item_indexes(channel, "Download"):
                     item = channel.items[item_index]
-                    print(f"Downloading {item.title}")
-                    t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
+                    logging.info(f"Downloading {item.title}")
+                    t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
                     t.start()
                     self.threads.append(t)
             
@@ -82,7 +81,7 @@ class YCast:
                 channel = self.select_channel("Delete")
                 for item_index in self.select_item_indexes(channel, "Delete"):
                     item = channel.items[item_index]
-                    t = threading.Thread(target=self.manager.delete_podcast, args=(item, channel))
+                    t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
                     t.start()
                     self.threads.append(t)
             
@@ -151,7 +150,7 @@ class YCast:
                 continue
 
             if item_index > len(channel.items) or item_index < 0:
-                print(f"Item must be between {0} and {len(channel.items)-1}")
+                print(f"Option must be between {0} and {len(channel.items)-1}")
                 continue
 
             return item_index
@@ -159,7 +158,7 @@ class YCast:
     def select_item_indexes(self, channel, purpose):
         cont = True
         while cont:
-            
+
             cont = False
             # TODO: Paginate Results if they are greater than 10 (or some other value)
             self.manager.show_items(channel)
@@ -174,7 +173,7 @@ class YCast:
 
             for i in item_indexes:
                 if i > len(channel.items) or i < 0:
-                    print(f"Items must be between {0} and {len(channel.items)-1}")
+                    print(f"Options must be between {0} and {len(channel.items)-1}")
                     cont = True
                     break
 
