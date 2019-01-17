@@ -20,6 +20,7 @@ class YCast:
         sys.exit(0)
 
     def handle_exit(self):
+        self.player.quit()
         self.manager.store_channels()
         for thread in self.threads:
             if thread.is_alive():
@@ -92,7 +93,7 @@ class YCast:
                 channel = self.select_channel("Play")
                 for item_index in self.select_item_indexes(channel, "Play"):
                     item = channel.items[item_index]
-                    self.player.play(item)
+                    self.player.play(item, channel)
 
             elif cmd == "pause":
                 self.player.pause()

@@ -1,0 +1,2 @@
+class YCastException(Exception):
+    pass

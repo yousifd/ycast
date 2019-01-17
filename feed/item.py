@@ -15,3 +15,4 @@ class Item:
 
         # Internal
         self.downloaded = False
+        self.progress = 0

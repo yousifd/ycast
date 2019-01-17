@@ -83,7 +83,6 @@ class Manager:
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
         item.downloaded = True
-        # TODO: Notification upon download complete?
 
     def delete_podcast(self, item, channel):
         if not item.downloaded:

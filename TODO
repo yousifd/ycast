@@ -6,10 +6,18 @@ CLI:
     - Interactive and Dynamic CLI
         # Scroll through list of channels and items
     - Download Progress Bar
+    - Notification on thread completion (Download, subscribe, etc.)
 
 Player:
     - Stream Audio
     - Play audio if it is downloaded, stream it if it is not
+    - Volume Control
+    - Playback Speed
+    - Skip Forward
+    - Skip Backward
+    - Restart
+    - Go to Position
+    - Support Playlists
 
 Downloads:
     - Custom Download Directory

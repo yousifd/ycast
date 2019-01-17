@@ -3,6 +3,9 @@ class GUID:
         self.value = ""
         self.isPermaLink = True
     
+    def __str__(self):
+        return self.value
+    
     def __hash__(self):
         return self.value
     

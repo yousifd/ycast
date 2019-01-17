@@ -1,7 +1,5 @@
 *.mp3
 config/
-# Temporary
-testaudio/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
