@@ -23,8 +23,20 @@ class Channel:
         self.skipDays = ""
 
     def info_str(self):
-        # TODO: String of Information
-        pass
+        res = []
+        res.append(f"{self.title} ({self.link})\n")
+        if self.language:
+            res.append(f"Language: {self.language}\n")
+        if self.copyright:
+            res.append(f"Copyright: {self.copyright}\n")
+        if self.category:
+            for category in self.category:
+                if category == self.category[-1]:
+                    res.append(f"{category.value}\n")
+                else:
+                    res.append(f"{category.value}, ")
+        res.append(f"Description: {self.description}")
+        return "".join(res)
 
     def __str__(self):
         return self.title

@@ -1,7 +1,7 @@
 CLI:
     ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
     ☐ Abstract input and output loops @created(19-01-17 02:02)
-        Have a map from keywords to function replace all input-output loops with it
+        Have a map from keywords to functions replace all input-output loops with it
 
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)

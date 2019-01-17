@@ -18,8 +18,25 @@ class Item:
         self.progress = 0
     
     def info_str(self):
-        # TODO: String of Information
-        pass
+        res = []
+        res.append(f"{self.title} ({self.enclosure.url})\n")
+        if self.author:
+            res.append(f"Author: {self.author}\n")
+        if self.pubDate:
+            res.append(f"Published On: {self.pubDate}\n")
+        if self.category:
+            for category in self.category:
+                if category == self.category[-1]:
+                    res.append(f"{category.value}\n")
+                else:
+                    res.append(f"{category.value}, ")
+        if self.guid:
+            res.append(f"GUID: {self.guid}\n")
+        if self.comments:
+            res.append(f"Comments: {self.comments}\n")
+        res.append(f"Description: {self.description}\n") # TODO: Parse HTML
+        res.append(f"Downloaded: {self.downloaded}")
+        return "".join(res)
     
     def __str__(self):
         return self.title
