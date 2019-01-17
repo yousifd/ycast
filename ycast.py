@@ -6,7 +6,7 @@ import sys
 import os
 import pickle
 
-from manager import Manager
+from manager import Manager, ManagerNotDownloaded, ManagerAlreadyDownloaded, ManagerAlreadySubscribed
 from player import Player, PlayerInvalidVolumeChange
 from paginator import Paginator, FirstPageException, LastPageException
 
@@ -71,7 +71,10 @@ class YCast:
                     print("Please specify a Podcast to subscribe to!")
                     continue
                 for url in args.split(" "):
-                    self.manager.subscribe_to_channel(url)
+                    try:
+                        self.manager.subscribe_to_channel(url)
+                    except ManagerAlreadySubscribed:
+                        print("Podcast {url} already subscribed to!")
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
                 self.get_channel_apply("Unsubscribe", self.manager.unsubscribe_from_channel)
@@ -81,10 +84,16 @@ class YCast:
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
-                self.get_items_apply("Download", self.manager.download_item)
+                try:
+                    self.get_items_apply("Download", self.manager.download_item)
+                except ManagerAlreadyDownloaded:
+                    print("Episode has already been downloaded")
             
             elif cmd == "delete" or cmd == "del":
-                self.get_items_apply("Delete", self.manager.delete_item)
+                try:
+                    self.get_items_apply("Delete", self.manager.delete_item)
+                except ManagerNotDownloaded:
+                    print("Episode hasn't been downloaded yet!")
             
             elif cmd == "sync":
                 updates = self.manager.update_all()

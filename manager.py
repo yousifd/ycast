@@ -28,6 +28,9 @@ class ManagerAlreadyDownloaded(ManagerException):
 class ManagerNotDownloaded(ManagerException):
     pass
 
+class ManagerAlreadySubscribed(ManagerException):
+    pass
+
 class Manager:
     def __init__(self):
         self.channels = {} # Pickled
@@ -71,8 +74,7 @@ class Manager:
 
     def download_item(self, item, channel):
         if item.downloaded:
-            print(f"Episode {item.title} has already been downloaded") # TODO: Raise Exception
-            return
+            raise ManagerAlreadyDownloaded
 
         if not os.path.exists(f"downloads/{channel.title}"):
             try:
@@ -91,8 +93,7 @@ class Manager:
 
     def delete_item(self, item, channel):
         if not item.downloaded:
-            print(f"Episode {item.title} hasn't been downloaded yet!") # TODO: Raise Exception
-            return
+            raise ManagerNotDownloaded
 
         file = f"downloads/{channel.title}/{item.title}.mp3"
         t = threading.Thread(target=os.remove, args=(file,), name=f"Deleting {item.title}")
@@ -117,8 +118,8 @@ class Manager:
 
     def subscribe_to_channel(self, url):
         if url in self.channels:
-            print(f"Podcast {url} already subscribed to!") # TODO: Raise Exception
-            return
+            raise ManagerAlreadySubscribed
+
         t = threading.Thread(target=self.sub_to_channel_thread, args=(url,), name=f"Subscribing to {url}")
         t.start()
         self.threads.append(t)
