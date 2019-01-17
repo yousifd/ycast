@@ -7,8 +7,7 @@ verify_ssl = true
 
 [packages]
 requests = "*"
-pyaudio = "*"
-sounddevice = "*"
+pygame = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
