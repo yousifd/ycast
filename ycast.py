@@ -70,8 +70,10 @@ class YCast:
             
             elif cmd == "download" or cmd == "d":
                 channel = self.select_channel("Download")
+                print("DOWNLOADING")
                 for item_index in self.select_item_indexes(channel, "Download"):
                     item = channel.items[item_index]
+                    print(f"Downloading {item.title}")
                     t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
                     t.start()
                     self.threads.append(t)
@@ -93,9 +95,8 @@ class YCast:
 
             elif cmd == "play" or cmd == "p":
                 channel = self.select_channel("Play")
-                for item_index in self.select_item_indexes(channel, "Play"):
-                    item = channel.items[item_index]
-                    self.player.play(item, channel)
+                item = channel.items[self.select_item(channel, "Play")]
+                self.player.play(item, channel)
 
             elif cmd == "pause":
                 self.player.pause()
@@ -119,26 +120,64 @@ class YCast:
                 print("Invalid Command!")
 
     def select_channel(self, purpose):
-        # TODO: Paginate Results if they are greater than 10 (or some other value)
-        channels = list(self.manager.channels.values())
-        self.manager.show_channels()
-        # TODO: Deal with Invalid Inputs
-        channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
-        return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
+        while True:
+
+            # TODO: Paginate Results if they are greater than 10 (or some other value)
+            channels = list(self.manager.channels.values())
+            self.manager.show_channels()
+
+            try:
+                channel_index = int(input(f"Which Channel do you want to {purpose} from? "))
+            except ValueError:
+                print("Invalid Input!")
+                continue
+
+            if channel_index > len(self.manager.channels.keys()) or channel_index < 0:
+                print(f"Option must be between {0} and {len(self.manager.channels.keys())}")
+                continue
+
+            return self.manager.channels[self.manager.title_to_url[channels[channel_index].title]]
     
     def select_item(self, channel, purpose):
-        # TODO: Paginate Results if they are greater than 10 (or some other value)
-        self.manager.show_items(channel)
-        # TODO: Deal with Invalid Inputs
-        item_index = int(input(f"Which item do you want to {purpose}? "))
-        return item_index
+        while True:
+
+            # TODO: Paginate Results if they are greater than 10 (or some other value)
+            self.manager.show_items(channel)
+
+            try:
+                item_index = int(input(f"Which item do you want to {purpose}? "))
+            except ValueError:
+                print("Invalid Input!")
+                continue
+
+            if item_index > len(channel.items) or item_index < 0:
+                print(f"Item must be between {0} and {len(channel.items)-1}")
+                continue
+
+            return item_index
 
     def select_item_indexes(self, channel, purpose):
-        # TODO: Paginate Results if they are greater than 10 (or some other value)
-        self.manager.show_items(channel)
-        # TODO: Deal with Invalid Inputs
-        item_indexes = input(f"Which Items do you want {purpose}? ")
-        item_indexes = map(int, item_indexes.split(" "))
+        cont = True
+        while cont:
+            
+            cont = False
+            # TODO: Paginate Results if they are greater than 10 (or some other value)
+            self.manager.show_items(channel)
+            item_indexes = input(f"Which Items do you want {purpose}? ")
+
+            try:
+                item_indexes = list(map(int, item_indexes.split(" ")))
+            except ValueError:
+                print("Invalid Input!")
+                cont = True
+                continue
+
+            for i in item_indexes:
+                if i > len(channel.items) or i < 0:
+                    print(f"Items must be between {0} and {len(channel.items)-1}")
+                    cont = True
+                    break
+
         return item_indexes
 
 if __name__ == "__main__":

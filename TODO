@@ -21,4 +21,3 @@ Downloads:
 Errors:
     ☐ Raise Exceptions instead of just printing
         # Handle all printing in the Ycast class
-    ☐ Deal with Input Errors

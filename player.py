@@ -72,7 +72,6 @@ class Player:
             raise PlayerInvalidVolumeChange
         self.volume += amount
         self.music.set_volume(self.volume)
-        pass
 
     def skip(self, amount):
         self.music.set_pos(amount)

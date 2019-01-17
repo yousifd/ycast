@@ -21,6 +21,12 @@ from exceptions import YCastException
 class ManagerException(YCastException):
     pass
 
+class ManagerAlreadyDownloaded(ManagerException):
+    pass
+
+class ManagerNotDownloaded(ManagerException):
+    pass
+
 class Manager:
     def __init__(self):
         self.channels = {} # Pickled
@@ -47,8 +53,10 @@ class Manager:
 
     def show_items(self, channel):
         # TODO: Move to ycast.py
-        if channel.link not in self.channels:
-            print("Channel doesn't Exist!")
+        if channel.title  not in self.title_to_url:
+            print(f"Channel {channel.title} doesn't Exist!")
+            return
+        print(f"{channel.title}")
         for i, item in enumerate(channel.items):
             print(f"  {i}) {item.title} ({item.enclosure.url})")
 
@@ -56,6 +64,7 @@ class Manager:
         # TODO: Move to ycast.py
         if not self.channels.keys():
             print("No Podcasts Yet!")
+            return
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
             print(f"{i}) {channel.title}")
@@ -64,6 +73,7 @@ class Manager:
         # TODO: Move to ycast.py
         if not self.channels.keys():
             print("No Podcasts Yet!")
+            return
         for i, pair in enumerate(self.channels.items()):
             channel = pair[1]
             print(f"{i}) {channel.title}")
@@ -74,7 +84,7 @@ class Manager:
         channel = self.channels[self.title_to_url[channel.title]]
         item = channel.items[item_index]
         if item.downloaded:
-            print("Episode has already downloaded!")
+            print(f"Episode {item.title} has already been downloaded")
             return
 
         if not os.path.exists(f"downloads/{channel.title}"):
@@ -90,7 +100,7 @@ class Manager:
 
     def delete_podcast(self, item, channel):
         if not item.downloaded:
-            print("Episode hasn't been downloaded yet!")
+            print(f"Episode {item.title} hasn't been downloaded yet!")
             return
         os.remove(f"downloads/{channel.title}/{item.title}.mp3")
         item.downloaded = False
