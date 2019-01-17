@@ -74,11 +74,15 @@ class YCast:
                     print(channel.info_str())
             
             elif cmd == "iinfo" or cmd == "ii":
-                channel = self.select_channel("Info")
-                if channel is not None:
-                    item_index = self.select_item(channel, "Info")
-                    if item_index is not None:
-                        print(channel.items[item_index].info_str())
+                item_index = None
+                while item_index is None:
+                    channel = self.select_channel("Info")
+                    if channel is not None:
+                        item_index = self.select_item(channel, "Info")
+                        if item_index is not None:
+                            print(channel.items[item_index].info_str())
+                    else:
+                        break
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 if args is None:
@@ -99,44 +103,57 @@ class YCast:
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
-                channel = self.select_channel("Download")
-                if channel is not None:
-                    item_indexes = self.select_item_indexes(channel, "Download")
-                    if item_indexes is not None:
-                        for item_index in item_indexes:
-                            item = channel.items[item_index]
-                            logging.info(f"Downloading {item.title}")
-                            t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
-                            t.start()
-                            self.threads.append(t)
+                item_indexes = None
+                while item_indexes is None:
+                    channel = self.select_channel("Download")
+                    if channel is not None:
+                        item_indexes = self.select_item_indexes(channel, "Download")
+                        if item_indexes is not None:
+                            for item_index in item_indexes:
+                                item = channel.items[item_index]
+                                logging.info(f"Downloading {item.title}")
+                                t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
+                                t.start()
+                                self.threads.append(t)
+                    else:
+                        break
             
             elif cmd == "delete" or cmd == "del":
-                channel = self.select_channel("Delete")
-                if channel is not None:
-                    item_indexes = self.select_item_indexes(channel, "Delete")
-                    if item_indexes is not None:
-                        for item_index in item_indexes:
-                            item = channel.items[item_index]
-                            t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
-                            t.start()
-                            self.threads.append(t)
+                item_indexes = None
+                while item_indexes is None:
+                    channel = self.select_channel("Delete")
+                    if channel is not None:
+                        item_indexes = self.select_item_indexes(channel, "Delete")
+                        if item_indexes is not None:
+                            for item_index in item_indexes:
+                                item = channel.items[item_index]
+                                t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
+                                t.start()
+                                self.threads.append(t)
+                    else:
+                        break
             
             elif cmd == "sync":
-                self.manager.update_all()
+                updates = self.manager.update_all()
+                print(updates)
 
             elif cmd == "update" or cmd == "u":
                 channel = self.select_channel("Update")
                 if channel is not None:
-                    self.manager.update(channel)
+                    update = self.manager.update(channel)
+                    print(update)
 
             elif cmd == "play" or cmd == "p":
-                # TODO: Ability to go back to channels list
-                channel = self.select_channel("Play")
-                if channel is not None:
-                    item_index = self.select_item(channel, "Play")
-                    if item_index is not None:
-                        item = channel.items[item_index]
-                        self.player.play(item, channel)
+                item_index = None
+                while item_index is None:
+                    channel = self.select_channel("Play")
+                    if channel is not None:
+                        item_index = self.select_item(channel, "Play")
+                        if item_index is not None:
+                            item = channel.items[item_index]
+                            self.player.play(item, channel)
+                    else:
+                        break
 
             elif cmd == "pause":
                 self.player.pause()
@@ -188,7 +205,7 @@ class YCast:
                         paginator.get_next()
                     except LastPageException:
                         print("Last Page")
-                elif item_index == "b":
+                elif item_index == "p":
                     try:
                         paginator.get_prev()
                     except FirstPageException:
@@ -207,7 +224,6 @@ class YCast:
             return
 
         while True:
-            print(paginator.get_current_page())
             for i, channel in enumerate(paginator.get_current_page()):
                 print(f"{i+paginator.current_min}) {channel.title}")
 
@@ -217,7 +233,7 @@ class YCast:
                     paginator.get_next()
                 except LastPageException:
                     print("Last Page")
-            elif channel_index == "b":
+            elif channel_index == "p":
                 try:
                     paginator.get_prev()
                 except FirstPageException:
@@ -252,7 +268,7 @@ class YCast:
                     paginator.get_next()
                 except LastPageException:
                     print("Last Page")
-            elif item_index == "b":
+            elif item_index == "p":
                 try:
                     paginator.get_prev()
                 except FirstPageException:
@@ -288,7 +304,7 @@ class YCast:
                     paginator.get_next()
                 except LastPageException:
                     print("Last Page")
-            elif item_indexes == "b":
+            elif item_indexes == "p":
                 try:
                     paginator.get_prev()
                 except FirstPageException:

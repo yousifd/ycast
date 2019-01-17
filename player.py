@@ -24,9 +24,7 @@ class Player:
         self.init_mixer()
         self.volume = self.music.get_volume()
 
-        # TODO: Reset item.position upon episode completion
         self.item = None
-        self.queue = [] # TODO: Implmenet Play Queue
         self.state = self.State.LOADING
     
     def __getstate__(self):
@@ -55,7 +53,7 @@ class Player:
         self.item = item
         if item.downloaded:
             self.play_file(item, channel)
-        else: # TODO: Stream
+        else:
             print("Episode Not Downloaded!")
             return
         self.state = self.State.PLAYING
