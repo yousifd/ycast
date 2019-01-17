@@ -154,11 +154,13 @@ class YCast:
                 if args is None:
                     print("Please specify volume value!")
                     continue
+
                 amount = self.player.volume
                 try:
                     amount = int(args)
                 except ValueError:
                     print("Invalid Volume Value")
+
                 try:
                     self.player.set_volume(float(amount)/10.0)
                 except PlayerInvalidVolumeChange:

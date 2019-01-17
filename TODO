@@ -1,11 +1,14 @@
 CLI:
     ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
+    ☐ Abstract input and output loops @created(19-01-17 02:02)
+        Have a map from keywords to function replace all input-output loops with it
 
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
     ☐ Play audio if it is downloaded, stream it if it is not @created(19-01-16 23:29)
     ☐ Playback Speed @created(19-01-17 00:18)
     ☐ Ability to skip forwards and backwards @created(19-01-17 00:18)
+    ☐ Playback Speed Normalization @created(19-01-17 01:57)
     
 Errors:
     ☐ Raise Exceptions instead of just printing @created(19-01-16 23:29)
@@ -14,6 +17,3 @@ Errors:
 Project:
     ☐ README @created(19-01-16 23:29)
     ☐ Typing @created(19-01-17 01:51)
-
-Paginator:
-    ☐ Modularize a bit more @created(19-01-17 01:30)

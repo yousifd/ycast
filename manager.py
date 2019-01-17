@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 
 import requests
+from dateutil.parser import parse
 
 from feed.channel import Channel
 from feed.item import Item
@@ -84,6 +85,7 @@ class Manager:
 
     def update(self, channel):
         # TODO: Check for Updates
+        # TODO: Show/return new episodes
         pass
 
     def unsubscribe_from_channel(self, channel_title):
@@ -217,12 +219,4 @@ class Manager:
 
 
 def parse_pub_date(pubDate):
-    # TODO: Deal with non-UTC timezones
-    ret = None
-    try:
-        ret = datetime.strptime(pubDate, "%a, %d %b %Y %X %Z")
-    except ValueError as e:
-        logging.info(f"Channel Parsing: {e}")
-        ret = datetime.strptime(
-            pubDate, "%a, %d %b %Y %X %z")
-    return ret
+    return parse(pubDate, ignoretz=True)
