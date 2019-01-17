@@ -34,16 +34,19 @@ class YCast:
 
     def handle_exit(self):
         self.player.quit()
-        for thread in self.threads:
-            if thread.is_alive():
-                print(f"Waiting for: {thread.name}")
-            thread.join()
+        self.wait_for_all_threads()
         with open("config/manager.pkl", "wb") as output:
             pickle.dump(self.manager, output, pickle.HIGHEST_PROTOCOL)
         with open("config/player.pkl", "wb") as output:
             pickle.dump(self.player, output, pickle.HIGHEST_PROTOCOL)
         self.quit = True
         print("Goodbye!")
+
+    def wait_for_all_threads(self):
+        for thread in self.threads:
+            if thread.is_alive():
+                print(f"Waiting for: {thread.name}")
+            thread.join()
     
     def start(self):
         # RT https://roosterteeth.com/show/rt-podcast/feed/mp3
@@ -87,7 +90,7 @@ class YCast:
                     self.manager.unsubscribe_from_channel(channel.title)
             
             elif cmd == "list" or cmd == "ls":
-                # TODO: Wait for all subscribe threads to finish first
+                self.wait_for_all_threads()
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
@@ -180,7 +183,7 @@ class YCast:
 
     def select_channel(self, purpose):
         channels = list(self.manager.channels.values())
-        paginator = Paginator(channels, 0, len(channels), 10)
+        paginator = Paginator(channels, 0, len(channels))
 
         if len(channels) == 0:
             print("No Podcasts Available Yet!")
@@ -218,7 +221,7 @@ class YCast:
     
     def select_item(self, channel, purpose):
         items = channel.items
-        paginator = Paginator(items, 0, len(items), 10)
+        paginator = Paginator(items, 0, len(items))
 
         while True:
             print(channel.title)
@@ -253,7 +256,7 @@ class YCast:
 
     def select_item_indexes(self, channel, purpose):
         items = channel.items
-        paginator = Paginator(items, 0, len(items), 10)
+        paginator = Paginator(items, 0, len(items))
 
         cont = True
         while cont:

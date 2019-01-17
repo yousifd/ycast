@@ -8,11 +8,11 @@ class LastPageException(PaginatorException):
     pass
 
 class Paginator:
-        def __init__(self, entries, min_index, max_index, jump_length):
+        def __init__(self, entries, min_index, max_index, jump_length=10):
             self.entries = entries
             self.min_index = min_index
             self.max_index = max_index
-            self.jump_length = jump_length # TODO: Customize based on terminal height
+            self.jump_length = jump_length
             self.current_min = min_index
             self.current_max = jump_length if max_index > jump_length else max_index
 
