@@ -2,7 +2,8 @@ CLI:
     ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
     ☐ Abstract input and output loops @created(19-01-17 02:02)
         Have a map from keywords to functions replace all input-output loops with it
-    ☐ Simplify all item and channel selection commands @created(19-01-17 04:05)
+    ✔ Simplify all item and channel selection commands @created(19-01-17 04:42) @done(19-01-17 04:42)
+        Make a function that takes in purpose and function which executes after selecting a channel/item/items
 
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
@@ -20,3 +21,4 @@ Errors:
 Project:
     ☐ README @created(19-01-16 23:29)
     ☐ Typing @created(19-01-17 01:51)
+    ☐ Move Threading to sub-module instead of pygame @created(19-01-17 04:12)

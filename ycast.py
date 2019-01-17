@@ -69,40 +69,29 @@ class YCast:
                 continue
 
             elif cmd == "cinfo" or cmd == "ci":
-                channel = self.select_channel("Info")
-                if channel is not None:
-                    print(channel.info_str())
+                self.get_channel_apply("Info", lambda c: print(c.info_str()))
             
             elif cmd == "iinfo" or cmd == "ii":
-                item_index = None
-                while item_index is None:
-                    channel = self.select_channel("Info")
-                    if channel is not None:
-                        item_index = self.select_item(channel, "Info")
-                        if item_index is not None:
-                            print(channel.items[item_index].info_str())
-                    else:
-                        break
+                self.get_item_apply("Info", lambda i, c: print(i.info_str()))
             
             elif cmd == "subscribe" or cmd == "sub" or cmd == "add":
                 if args is None:
                     print("Please specify a Podcast to subscribe to!")
                     continue
                 for url in args.split(" "):
-                    t = threading.Thread(target=self.manager.subscribe_to_channel, args=(url,), name=f"Subscribing to {url}")
+                    t = threading.Thread(target=self.manager.subscribe_to_channel, args=(url,), name=f"Subscribing to {url}") # TODO: Move into manager
                     t.start()
                     self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
-                channel = self.select_channel("Unsubscribe")
-                if channel is not None:
-                    self.manager.unsubscribe_from_channel(channel.title)
+                self.get_channel_apply("Unsubscribe", self.manager.unsubscribe_from_channel)
             
             elif cmd == "list" or cmd == "ls":
                 self.wait_for_all_threads()
                 self.show_all()
             
             elif cmd == "download" or cmd == "d":
+                # TODO: Use universal function
                 item_indexes = None
                 while item_indexes is None:
                     channel = self.select_channel("Download")
@@ -112,13 +101,14 @@ class YCast:
                             for item_index in item_indexes:
                                 item = channel.items[item_index]
                                 logging.info(f"Downloading {item.title}")
-                                t = threading.Thread(target=self.manager.download_item, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
+                                t = threading.Thread(target=self.manager.download_item, args=(item, channel), name=f"Downloading {channel.title}: {item.title}") # TODO: Move into manager
                                 t.start()
                                 self.threads.append(t)
                     else:
                         break
             
             elif cmd == "delete" or cmd == "del":
+                # TODO: Use universal function
                 item_indexes = None
                 while item_indexes is None:
                     channel = self.select_channel("Delete")
@@ -127,7 +117,7 @@ class YCast:
                         if item_indexes is not None:
                             for item_index in item_indexes:
                                 item = channel.items[item_index]
-                                t = threading.Thread(target=self.manager.delete_item, args=(item, channel))
+                                t = threading.Thread(target=self.manager.delete_item, args=(item, channel)) # TODO: Move into manager
                                 t.start()
                                 self.threads.append(t)
                     else:
@@ -138,22 +128,10 @@ class YCast:
                 print(updates)
 
             elif cmd == "update" or cmd == "u":
-                channel = self.select_channel("Update")
-                if channel is not None:
-                    update = self.manager.update(channel)
-                    print(update)
+                self.get_channel_apply("Update", self.update_channel)
 
             elif cmd == "play" or cmd == "p":
-                item_index = None
-                while item_index is None:
-                    channel = self.select_channel("Play")
-                    if channel is not None:
-                        item_index = self.select_item(channel, "Play")
-                        if item_index is not None:
-                            item = channel.items[item_index]
-                            self.player.play(item, channel)
-                    else:
-                        break
+                self.get_item_apply("Play", self.player.play)
 
             elif cmd == "pause":
                 self.player.pause()
@@ -189,6 +167,10 @@ class YCast:
             else:
                 print("Invalid Command!")
 
+    def update_channel(self, channel):
+        update = self.manager.update(channel)
+        print(update)
+
     def show_all(self):
         item_index = None
         while item_index is None:
@@ -216,6 +198,36 @@ class YCast:
                         break
                     else:
                         print("Invalid Command!")
+            else:
+                break
+    
+    def get_channel_apply(self, purpose, action):
+        channel = self.select_channel(purpose)
+        if channel is not None:
+            action(channel)
+    
+    def get_item_apply(self, purpose, action):
+        item_index = None
+        while item_index is None:
+            channel = self.select_channel(purpose)
+            if channel is not None:
+                item_index = self.select_item(channel, purpose)
+                if item_index is not None:
+                    item = channel.items[item_index]
+                    action(item, channel)
+            else:
+                break
+    
+    def get_items_apply(self, purpose, action):
+        item_indexes = None
+        while item_indexes is None:
+            channel = self.select_channel(purpose)
+            if channel is not None:
+                item_indexes = self.select_item_indexes(channel, purpose)
+                if item_indexes is not None:
+                    for item_index in item_indexes:
+                        item = channel.items[item_index]
+                        action(item, channel)
             else:
                 break
 
@@ -316,7 +328,7 @@ class YCast:
                 except FirstPageException:
                     print("First Page")
             elif item_indexes == "q":
-                item_index = None
+                item_indexes = None
                 break
             else:
                 try:

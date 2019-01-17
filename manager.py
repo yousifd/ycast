@@ -50,11 +50,9 @@ class Manager:
                 if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
                     item.downloaded = False
     
-    def download_item(self, item_index, channel):
-        channel = self.channels[self.title_to_url[channel.title]]
-        item = channel.items[item_index]
+    def download_item(self, item, channel):
         if item.downloaded:
-            print(f"Episode {item.title} has already been downloaded")
+            print(f"Episode {item.title} has already been downloaded") # TODO: Raise Exception
             return
 
         if not os.path.exists(f"downloads/{channel.title}"):
@@ -73,7 +71,7 @@ class Manager:
 
     def delete_item(self, item, channel):
         if not item.downloaded:
-            print(f"Episode {item.title} hasn't been downloaded yet!")
+            print(f"Episode {item.title} hasn't been downloaded yet!") # TODO: Raise Exception
             return
 
         os.remove(f"downloads/{channel.title}/{item.title}.mp3")
@@ -88,14 +86,15 @@ class Manager:
         # TODO: Show/return new episodes
         pass
 
-    def unsubscribe_from_channel(self, channel_title):
+    def unsubscribe_from_channel(self, channel):
+        channel_title = channel.title
         if os.path.exists(f"downloads/{channel_title}"):
             shutil.rmtree(f"downloads/{channel_title}")
         del self.channels[self.title_to_url[channel_title]]
 
     def subscribe_to_channel(self, url):
         if url in self.channels:
-            print(f"Podcast {url} already subscribed to!")
+            print(f"Podcast {url} already subscribed to!") # TODO: Raise Exception
             return
         r = requests.get(url)
         logging.debug(r.text)

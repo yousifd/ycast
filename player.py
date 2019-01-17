@@ -53,9 +53,6 @@ class Player:
         self.item = item
         if item.downloaded:
             self.play_file(item, channel)
-        else:
-            print("Episode Not Downloaded!")
-            return
         self.state = self.State.PLAYING
     
     def play_file(self, item, channel):
