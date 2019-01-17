@@ -190,30 +190,34 @@ class YCast:
                 print("Invalid Command!")
 
     def show_all(self):
-        channel = self.select_channel("List")
-        if channel is not None:
-            paginator = Paginator(channel.items)
+        item_index = None
+        while item_index is None:
+            channel = self.select_channel("List")
+            if channel is not None:
+                paginator = Paginator(channel.items)
 
-            while True:
-                print(channel.title)
-                for i, item in enumerate(paginator.get_current_page()):
-                    print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
+                while True:
+                    for i, item in enumerate(paginator.get_current_page()):
+                        print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
 
-                item_index = input(f"browse> ")
-                if item_index == "n":
-                    try:
-                        paginator.get_next()
-                    except LastPageException:
-                        print("Last Page")
-                elif item_index == "p":
-                    try:
-                        paginator.get_prev()
-                    except FirstPageException:
-                        print("First Page")
-                elif item_index == "q":
-                    break
-                else:
-                    print("Invalid Command!")
+                    item_index = input(f"{channel.title}> ")
+                    if item_index == "n":
+                        try:
+                            paginator.get_next()
+                        except LastPageException:
+                            print("Last Page")
+                    elif item_index == "p":
+                        try:
+                            paginator.get_prev()
+                        except FirstPageException:
+                            print("First Page")
+                    elif item_index == "q":
+                        item_index = None
+                        break
+                    else:
+                        print("Invalid Command!")
+            else:
+                break
 
     def select_channel(self, purpose):
         channels = list(self.manager.channels.values())
@@ -239,6 +243,7 @@ class YCast:
                 except FirstPageException:
                     print("First Page")
             elif channel_index == "q":
+                channel_index = None
                 break
             else:
                 try:
@@ -274,6 +279,7 @@ class YCast:
                 except FirstPageException:
                     print("First Page")
             elif item_index == "q":
+                item_index = None
                 break
             else:
                 try:
@@ -310,6 +316,7 @@ class YCast:
                 except FirstPageException:
                     print("First Page")
             elif item_indexes == "q":
+                item_index = None
                 break
             else:
                 try:
