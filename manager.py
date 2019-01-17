@@ -63,8 +63,8 @@ class Manager:
             for i, item in enumerate(channel.items):
                 print(f"  {i}) {item.title} ({item.enclosure.url})")
     
-    def download_podcast(self, item_index, channel_title):
-        channel = self.channels[self.title_to_url[channel_title]]
+    def download_podcast(self, item_index, channel):
+        channel = self.channels[self.title_to_url[channel.title]]
         item = channel.items[item_index]
         if item.downloaded:
             print("Episode has already downloaded!")

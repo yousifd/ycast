@@ -58,29 +58,18 @@ class YCast:
                     self.threads.append(t)
             
             elif cmd == "unsubscribe" or cmd == "unsub" or cmd == "remove":
-                # TODO: Move Channel selection to standalone function
-                channels = list(self.manager.channels.values())
-                self.manager.show_channels()
-                channel_index = int(input("Which Channel do you want to unsubscribe from? "))
-                self.manager.unsubscribe_from_podcast(channels[channel_index].title)
+                channel = self.select_channel()
+                self.manager.unsubscribe_from_podcast(channel.title)
             
             elif cmd == "list" or cmd == "ls":
                 # TODO: Pagination
                 self.manager.show_all()
             
             elif cmd == "download" or cmd == "d":
-                # TODO: Move Channel selection and item selection to standalone function
-                    # TODO: Paginate Results if they are greater than 10 (or some other value)
-                channels = list(self.manager.channels.values())
-                self.manager.show_channels()
-                channel_index = int(input("Which Channel do you want to download from? "))
-                channel = channels[channel_index]
-                self.manager.show_items(channel)
-                item_indexes = input("Which Items do you want download? ")
-                item_indexes = map(int, item_indexes.split(" "))
-                for item_index in item_indexes:
+                channel = self.select_channel()
+                for item_index in self.select_item_indexes(channel):
                     item = channel.items[item_index]
-                    t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel.title), name=f"Downloading {channel.title}: {item.title}")
+                    t = threading.Thread(target=self.manager.download_podcast, args=(item_index, channel), name=f"Downloading {channel.title}: {item.title}")
                     t.start()
                     self.threads.append(t)
             
@@ -123,6 +112,18 @@ class YCast:
             else:
                 print("Invalid Command!")
 
-    def select_channel(self, channels):
-        for i, channel in enumerate(channels):
-            print(f"{i}) {channel}")
+    def select_channel(self):
+        # TODO: Paginate Results if they are greater than 10 (or some other value)
+        channels = list(self.manager.channels.values())
+        self.manager.show_channels()
+        # TODO: Deal with Invalid Inputs
+        channel_index = int(input("Which Channel do you want to download from? "))
+        return channels[channel_index]
+    
+    def select_item_indexes(self, channel):
+        # TODO: Paginate Results if they are greater than 10 (or some other value)
+        self.manager.show_items(channel)
+        # TODO: Deal with Invalid Inputs
+        item_indexes = input("Which Items do you want download? ")
+        item_indexes = map(int, item_indexes.split(" "))
+        return item_indexes
