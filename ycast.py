@@ -280,9 +280,11 @@ class YCast:
                         print(f"Options must be between {0} and {len(channel.items)-1}")
                         cont = True
                         break
+                
+                if cont:
+                    continue
 
                 return item_indexes
-            cont = True
     
     def paginator_next(self, paginator):
         try:
