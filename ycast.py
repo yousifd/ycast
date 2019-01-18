@@ -187,15 +187,9 @@ class YCast:
 
                     item_index = input(f"{channel.title}> ")
                     if item_index == "n":
-                        try:
-                            paginator.get_next()
-                        except LastPageException:
-                            print("Last Page")
+                        self.paginator_next(paginator)
                     elif item_index == "p":
-                        try:
-                            paginator.get_prev()
-                        except FirstPageException:
-                            print("First Page")
+                        self.paginator_prev(paginator)
                     elif item_index == "q":
                         item_index = None
                         break
@@ -236,15 +230,9 @@ class YCast:
 
             channel_index = input(f"Which Channel do you want to {purpose} from? ")
             if channel_index == "n":
-                try:
-                    paginator.get_next()
-                except LastPageException:
-                    print("Last Page")
+                self.paginator_next(paginator)
             elif channel_index == "p":
-                try:
-                    paginator.get_prev()
-                except FirstPageException:
-                    print("First Page")
+                self.paginator_prev(paginator)
             elif channel_index == "q":
                 channel_index = None
                 break
@@ -273,15 +261,9 @@ class YCast:
 
             item_indexes = input(f"Which Items do you want {purpose}? ")
             if item_indexes == "n":
-                try:
-                    paginator.get_next()
-                except LastPageException:
-                    print("Last Page")
+                self.paginator_next(paginator)
             elif item_indexes == "p":
-                try:
-                    paginator.get_prev()
-                except FirstPageException:
-                    print("First Page")
+                self.paginator_prev(paginator)
             elif item_indexes == "q":
                 item_indexes = None
                 break
@@ -301,6 +283,18 @@ class YCast:
 
                 return item_indexes
             cont = True
+    
+    def paginator_next(self, paginator):
+        try:
+            paginator.get_next()
+        except LastPageException:
+            print("Last Page")
+    
+    def paginator_prev(self, paginator):
+        try:
+            paginator.get_prev()
+        except FirstPageException:
+            print("First Page")
 
 if __name__ == "__main__":
     cast = YCast()
