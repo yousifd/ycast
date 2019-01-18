@@ -69,16 +69,6 @@ class Manager:
             if thread.is_alive():
                 print(f"Waiting for: {thread.name}")
             thread.join()
-    
-    def download_url(self, channel, item):
-        url = item.enclosure.url
-        # TODO: Catch invalid URL Exceptions and raise to ycast
-        r = requests.get(url, stream=True)
-        filename = f"downloads/{channel.title}/{item.guid}.mp3"
-        item.filename = filename
-        with open(filename, "wb") as file:
-            for chunk in r.iter_content(chunk_size=1024):
-                file.write(chunk)
 
     def download_item(self, item, channel):
         if item.downloaded:
@@ -90,18 +80,32 @@ class Manager:
             except FileExistsError:
                 pass
 
-        t = threading.Thread(target=self.download_url, args=(channel, item), name=f"Downloading {channel.title}: {item.title}")
+        t = threading.Thread(target=self.download_thread, args=(
+            channel, item), name=f"Downloading {channel.title}: {item.title}")
         t.start()
         self.threads.append(t)
+    
+    def download_thread(self, channel, item):
+        url = item.enclosure.url
+        # TODO: Catch invalid URL Exceptions and raise to ycast
+        r = requests.get(url, stream=True)
+        filename = f"downloads/{channel.title}/{item.guid}.mp3"
+        item.filename = filename
+        with open(filename, "wb") as file:
+            for chunk in r.iter_content(chunk_size=1024):
+                file.write(chunk)
         item.downloaded = True
 
     def delete_item(self, item, channel):
         if not item.downloaded:
             raise ManagerNotDownloaded
 
-        t = threading.Thread(target=os.remove, args=(item.filename,), name=f"Deleting {item.title}")
+        t = threading.Thread(target=self.delete_thread, args=(item,), name=f"Deleting {channel.title}: {item.title}")
         t.start()
         self.threads.append(t)
+
+    def delete_thread(self, item):
+        os.remove(item.filename)
         item.downloaded = False
 
     def update_all(self):

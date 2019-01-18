@@ -111,6 +111,7 @@ class YCast:
             
             elif cmd == "delete" or cmd == "del":
                 # BUG: Deleting after stopping causes an invalid access to file
+                    # For some reason pygame.mixer.music still accesses the file
                 self.manager.wait_for_all_threads()
                 try:
                     self.get_items_apply("Delete", self.manager.delete_item)
