@@ -1,8 +1,6 @@
 *.mp3
 config/
 .vscode/
-# Temporary
-cli.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
