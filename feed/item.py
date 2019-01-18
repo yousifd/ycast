@@ -16,6 +16,7 @@ class Item:
         self.source = None
 
         # Internal
+        self.filename = ""
         self.downloaded = False
         self.progress = 0
     

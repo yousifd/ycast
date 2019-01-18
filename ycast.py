@@ -54,8 +54,27 @@ class YCast:
                 args = line[1]
 
             if cmd == "help" or cmd == "?":
-                # TODO: Print Usage
-                pass
+                usage = list()
+                # TODO: Intro
+                # TODO: Help Command
+                # TODO: Channel Info
+                # TODO: Item Info
+                # TODO: Subscribe
+                # TODO: Unsubscribe
+                # TODO: List
+                # TODO: Download
+                # TODO: Delete
+                # TODO: Sync
+                # TODO: Update
+                # TODO: Quit
+                # TODO: Playback
+                    # TODO: Play
+                    # TODO: Pause
+                    # TODO: Unpause
+                    # TODO: stop
+                    # TODO: restart
+                    # TODO: Volume
+                print("".join(usage))
 
             elif cmd == "":
                 continue
@@ -91,6 +110,7 @@ class YCast:
                     print("Episode has already been downloaded")
             
             elif cmd == "delete" or cmd == "del":
+                # BUG: Deleting after stopping causes an invalid access to file
                 self.manager.wait_for_all_threads()
                 try:
                     self.get_items_apply("Delete", self.manager.delete_item)

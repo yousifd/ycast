@@ -57,7 +57,7 @@ class Player:
         self.state = self.State.PLAYING
     
     def play_file(self, item, channel):
-        self.music.load(f"downloads/{channel.title}/{item.title}.mp3")
+        self.music.load(item.filename)
         self.music.play(start=item.progress/1000)
     
     def pause(self):

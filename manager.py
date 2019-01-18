@@ -58,7 +58,7 @@ class Manager:
             self.title_to_url[channel.title] = url
             self.channel_to_items[channel.title] = set(channel.items)
             for item in channel.items:
-                if item.downloaded and item.title+".mp3" not in os.listdir(f"downloads/{channel.title}"):
+                if item.downloaded and not os.path.isfile(item.filename):
                     item.downloaded = False
     
     def quit(self):
@@ -70,9 +70,13 @@ class Manager:
                 print(f"Waiting for: {thread.name}")
             thread.join()
     
-    def download_url(self, url, channel_title, filename):
+    def download_url(self, channel, item):
+        url = item.enclosure.url
+        # TODO: Catch invalid URL Exceptions and raise to ycast
         r = requests.get(url, stream=True)
-        with open(f"downloads/{channel_title}/{filename}.mp3", "wb") as file:
+        filename = f"downloads/{channel.title}/{item.guid}.mp3"
+        item.filename = filename
+        with open(filename, "wb") as file:
             for chunk in r.iter_content(chunk_size=1024):
                 file.write(chunk)
 
@@ -85,12 +89,8 @@ class Manager:
                 os.makedirs(f"downloads/{channel.title}")
             except FileExistsError:
                 pass
-        url = item.enclosure.url
-        filename = item.title
-        channel_title = channel.title
 
-        t = threading.Thread(target=self.download_url, args=(
-            url, channel_title, filename), name=f"Downloading {channel.title}: {item.title}")
+        t = threading.Thread(target=self.download_url, args=(channel, item), name=f"Downloading {channel.title}: {item.title}")
         t.start()
         self.threads.append(t)
         item.downloaded = True
@@ -99,8 +99,7 @@ class Manager:
         if not item.downloaded:
             raise ManagerNotDownloaded
 
-        file = f"downloads/{channel.title}/{item.title}.mp3"
-        t = threading.Thread(target=os.remove, args=(file,), name=f"Deleting {item.title}")
+        t = threading.Thread(target=os.remove, args=(item.filename,), name=f"Deleting {item.title}")
         t.start()
         self.threads.append(t)
         item.downloaded = False
@@ -113,6 +112,7 @@ class Manager:
 
     def update(self, channel):
         updated = False
+        # TODO: Catch invalid URL Exceptions and raise to ycast
         r = requests.get(self.title_to_url[channel.title])
         channel_new = self.parse_channel(r.text)
         ret = [f"{channel.title}\n"]
