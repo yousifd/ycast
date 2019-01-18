@@ -31,6 +31,9 @@ class ManagerNotDownloaded(ManagerException):
 class ManagerAlreadySubscribed(ManagerException):
     pass
 
+class ManagerInvalidURL(ManagerException):
+    pass
+
 class Manager:
     def __init__(self):
         self.channels = {} # Pickled
@@ -87,8 +90,10 @@ class Manager:
     
     def download_thread(self, channel, item):
         url = item.enclosure.url
-        # TODO: Catch invalid URL Exceptions and raise to ycast
-        r = requests.get(url, stream=True)
+        try:
+            r = requests.get(url, stream=True)
+        except requests.exceptions.RequestException:
+            raise ManagerInvalidURL
         filename = f"downloads/{channel.title}/{item.guid}.mp3"
         item.filename = filename
         with open(filename, "wb") as file:
@@ -116,8 +121,10 @@ class Manager:
 
     def update(self, channel):
         updated = False
-        # TODO: Catch invalid URL Exceptions and raise to ycast
-        r = requests.get(self.title_to_url[channel.title])
+        try:
+            r = requests.get(self.title_to_url[channel.title])
+        except requests.exceptions.RequestException:
+            raise ManagerInvalidURL
         channel_new = self.parse_channel(r.text)
         ret = [f"{channel.title}\n"]
         for item_new in channel_new.items:
@@ -150,7 +157,10 @@ class Manager:
         self.threads.append(t)
     
     def sub_to_channel_thread(self, url):
-        r = requests.get(url)
+        try:
+            r = requests.get(url)
+        except requests.exceptions.RequestException:
+            raise ManagerInvalidURL
         logging.debug(r.text)
         channel = self.parse_channel(r.text)
         self.channels[url] = channel
