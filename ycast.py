@@ -45,6 +45,7 @@ class YCast:
         # GRC http://leoville.tv/podcasts/sn.xml
         # CC https://corridorcast.libsyn.com/rss
         while not self.quit:
+            # TODO: Replace with cli.py
             line = input("ycast> ")
             logging.debug(line)
             line = line.split(" ", 1)
@@ -110,8 +111,6 @@ class YCast:
                     print("Episode has already been downloaded")
             
             elif cmd == "delete" or cmd == "del":
-                # BUG: Deleting after stopping causes an invalid access to file
-                    # For some reason pygame.mixer.music still accesses the file
                 self.manager.wait_for_all_threads()
                 try:
                     self.get_items_apply("Delete", self.manager.delete_item)
@@ -183,6 +182,7 @@ class YCast:
                 paginator = Paginator(channel.items)
 
                 while True:
+                    # TODO: Replace with cli.py
                     for i, item in enumerate(paginator.get_current_page()):
                         print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")
 
@@ -229,6 +229,7 @@ class YCast:
             for i, channel in enumerate(paginator.get_current_page()):
                 print(f"{i+paginator.current_min}) {channel.title}")
 
+            # TODO: Replace with cli.py
             channel_index = input(f"Which Channel do you want to {purpose} from? ")
             if channel_index == "n":
                 self.paginator_next(paginator)
@@ -254,8 +255,10 @@ class YCast:
         items = channel.items
         paginator = Paginator(items)
 
+        # TODO: Can you do this without cont?
         cont = True
         while cont:
+            # TODO: Replace with cli.py
             cont = False
             for i, item in enumerate(paginator.get_current_page()):
                 print(f"  {i+paginator.current_min}) {item.title} ({item.enclosure.url}) Downloaded={item.downloaded}")

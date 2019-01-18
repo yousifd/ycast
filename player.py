@@ -25,6 +25,7 @@ class Player:
         self.volume = self.music.get_volume()
 
         self.item = None
+        self.file = None
         self.state = self.State.LOADING
         self.q = list()
     
@@ -32,10 +33,12 @@ class Player:
         d = dict(self.__dict__)
         del d['mixer']
         del d['music']
+        del d['file']
         return d
     
     def __setstate__(self, d):
         self.__dict__.update(d)
+        self.file = None
         self.init_mixer()
         self.music.set_volume(self.volume)
     
@@ -57,7 +60,8 @@ class Player:
         self.state = self.State.PLAYING
     
     def play_file(self, item, channel):
-        self.music.load(item.filename)
+        self.file = open(item.filename, "rb")
+        self.music.load(self.file)
         self.music.play(start=item.progress/1000)
     
     def pause(self):
@@ -72,6 +76,8 @@ class Player:
     def stop(self):
         if self.item is not None:
             self.item.progress += self.music.get_pos()
+        if self.file is not None:
+            self.file.close()
         self.music.stop()
         self.state = self.State.STOPPED
     
