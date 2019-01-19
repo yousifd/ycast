@@ -1,6 +1,3 @@
-CLI:
-    ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
-
 Player:
     ☐ Full MP3 Support (Downloaded and Streaming) @created(19-01-16 23:29)
         Python Bindings for https://github.com/lieff/minimp3
@@ -14,4 +11,6 @@ Player:
 
 Project:
     ☐ README @created(19-01-16 23:29)
-    ☐ setup.py using setuptools @created(19-01-17 16:11)
+
+CLI:
+    ☐ Notification on thread completion (Download, subscribe, Episode Complete, etc.) @created(19-01-16 23:29)
